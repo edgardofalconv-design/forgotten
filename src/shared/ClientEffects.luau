@@ -15,6 +15,22 @@ return function(enabled)
  local function effect(data)
   if not enabled() or #folder:GetChildren()>24 then return end
   local weapon=data.ability
+  if data.model and (weapon=="plasma" or weapon=="overdrive" or weapon=="selfRepair") and data.kind~="beam" then
+   local torso=data.model:FindFirstChild("UpperTorso") or data.model:FindFirstChild("Torso")
+   local hand=data.model:FindFirstChild("RightHand") or data.model:FindFirstChild("Right Arm")
+   local anchor=weapon=="plasma" and hand or torso
+   if anchor then
+    local attachment=Instance.new("Attachment");attachment.Name="V4EnergyFX"
+    attachment.Position=weapon=="overdrive" and Vector3.new(0,0,.6) or weapon=="selfRepair" and Vector3.new(0,-.25,-.6) or Vector3.new(0,-.55,0)
+    attachment.Parent=anchor
+    local particles=Instance.new("ParticleEmitter");particles.Texture="rbxasset://textures/particles/sparkles_main.dds"
+    particles.Color=ColorSequence.new(weapon=="selfRepair" and Color3.fromRGB(218,166,71) or Color3.fromRGB(72,186,224))
+    particles.LightEmission=.8;particles.Lifetime=NumberRange.new(.12,.3);particles.Speed=NumberRange.new(weapon=="overdrive" and 6 or 1,weapon=="overdrive" and 12 or 3)
+    particles.SpreadAngle=Vector2.new(18,18);particles.EmissionDirection=Enum.NormalId.Back;particles.Rate=0
+    particles.Size=NumberSequence.new({NumberSequenceKeypoint.new(0,.12),NumberSequenceKeypoint.new(1,0)})
+    particles.Parent=attachment;particles:Emit(14);Debris:AddItem(attachment,.6)
+   end
+  end
   if data.model and (weapon=="scythe" or weapon=="spin" or weapon=="cane" or weapon=="pan" or weapon=="claw") then
    local arm=data.model:FindFirstChild("RightHand") or data.model:FindFirstChild("Right Arm")
    if arm then
@@ -41,7 +57,7 @@ return function(enabled)
    local root=Instance.new("Part");root.Name="Centro";root.Size=Vector3.new(.1,.1,.1);root.CFrame=CFrame.new();root.Transparency=1
    root.Anchored=true;root.CanCollide=false;root.CanTouch=false;root.CanQuery=false;root.Parent=projectile;projectile.PrimaryPart=root
    if data.projectile=="cane" then
-    for _,spec in ipairs(VisualData.yellowguy) do if not spec.name:find("CombatMark") then Geometry.build(projectile,root,spec) end end
+    for _,spec in ipairs(VisualData.yellowguy) do if spec.weapon=="cane" then Geometry.build(projectile,root,spec) end end
    else
     for _,spec in ipairs(VisualData.pelotocino) do if spec.name=="Mechón Bacon 0" then Geometry.build(projectile,root,spec);break end end
    end
@@ -76,9 +92,14 @@ return function(enabled)
   p.Transparency=.65
   local duration=math.max(.15,math.min(data.duration or .4,6))
   if data.kind=="beam" and data.finish then
-   local distance=(data.finish-data.position).Magnitude
+   local start=data.position
+   if data.ability=="plasma" and data.model then
+    local hand=data.model:FindFirstChild("RightHand") or data.model:FindFirstChild("Right Arm")
+    if hand then start=hand.Position end
+   end
+   local distance=(data.finish-start).Magnitude
    if distance<.1 then p:Destroy();return end
-   p.Size=Vector3.new(.18,.18,distance);p.CFrame=CFrame.lookAt((data.position+data.finish)/2,data.finish)
+   p.Size=Vector3.new(.18,.18,distance);p.CFrame=CFrame.lookAt((start+data.finish)/2,data.finish)
   else
    local radius=math.min(data.radius or 2,24)
    p.Shape=Enum.PartType.Ball;p.Size=Vector3.new(radius*2,.22,radius*2);p.Position=data.position-Vector3.new(0,2.4,0)

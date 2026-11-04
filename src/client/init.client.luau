@@ -13,6 +13,7 @@ local roster=require(shared.Roster);local byId={};for _,entry in ipairs(roster) 
 require(shared.BasicAnimation)()
 require(shared.EditableAppearance).start()
 require(shared.GeneratorVisuals).animate()
+local updateEnvironment=require(shared.ClientEnvironment).start()
 pcall(function()game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false)end)
 local function follow(character)
  local h=character:WaitForChild("Humanoid",10)
@@ -81,6 +82,7 @@ local attackButton=T.button(hud,"Atacar","CLIC · ATACAR",UDim2.fromScale(.84,.7
 local statusLabel=T.label(gui,"Estados","",UDim2.fromScale(.3,.71),UDim2.fromScale(.68,.04),13,T.gold)
 local function refreshHUD()
  local active=state.phase=="Ronda" and player:GetAttribute("InRound")==true
+ updateEnvironment(state,active)
  hud.Visible=active;statusLabel.Visible=active
  local id=player:GetAttribute("CharacterId") or selected;local entry=byId[id]
  identity.Text=entry and entry.name or ""

@@ -21,6 +21,61 @@ local function rot(x,y,z,tx,ty,tz)return {x or 0,y or 0,z or 0,tx or 0,ty or 0,t
 local function mix(a,b,t)
  local r={};for i=1,6 do r[i]=(a[i] or 0)+((b[i] or 0)-(a[i] or 0))*t end;return r
 end
+-- V4 authored keyframes: preparation, contact and recovery share the server timing.
+local clips={
+ baconThrow={
+  {0,{RightShoulder={-.1,0,.05}}},
+  {.18,{RightShoulder={-2.1,0,-.45},RightElbow={-.8},Neck={.12,-.12}}},
+  {.31,{RightShoulder={-2.35,0,-.4},RightElbow={-1},RootJoint={0,-.16}}},
+  {.43,{RightShoulder={-2.45,-.25,.25},RightElbow={-.75},RootJoint={.08,-.3}}},
+  {.50,{RightShoulder={-1.4,.2,.1},RightElbow={-.04},RootJoint={-.12,.2}}},
+  {.78,{RightShoulder={-.25,0,.12},RootJoint={-.04,.08}}},
+  {1.05,{RightShoulder={-.1,0,.05}}}},
+ cane={
+  {0,{RightShoulder={-.12,0,.08}}},
+  {.12,{RightShoulder={-.3,-.25,-.55},RootJoint={0,-.3}}},
+  {.22,{RightShoulder={-1.35,.35,.45},RootJoint={-.13,.28}}},
+  {.4,{RightShoulder={-.7,.15,.65},RootJoint={-.06,.16}}},
+  {.65,{RightShoulder={-.12,0,.08}}}},
+ caneThrow={
+  {0,{RightShoulder={-.12,0,.08}}},
+  {.18,{RightShoulder={-2.15,-.22,.25},RootJoint={.05,-.25}}},
+  {.28,{RightShoulder={-1.45,.15,.1},RootJoint={-.12,.15}}},
+  {.55,{RightShoulder={-.45,.1,.1},RootJoint={-.04,.08}}},
+  {1.25,{RightShoulder={-.12,0,.08}}}},
+ caneRecover={
+  {0,{RightShoulder={-1.2,0,.2}}},
+  {.16,{RightShoulder={-1.4,0,.12},RightElbow={-.7}}},
+  {.36,{RightShoulder={-.5,0,.2},RightElbow={-.4}}},
+  {.6,{RightShoulder={-.12,0,.08}}}},
+ scythe={
+  {0,{RightShoulder={-.28,0,.16}}},
+  {.12,{RightShoulder={-.45,-.3,.3},LeftShoulder={-.9,0,-.5},RootJoint={.1,-.35}}},
+  {.28,{RightShoulder={1.4,.3,.15},LeftShoulder={-.3,.15,-.2},RootJoint={-.18,.35}}},
+  {.48,{RightShoulder={1.55,.45,.25},RootJoint={-.12,.5}}},
+  {.75,{RightShoulder={-.28,0,.16}}}},
+ plasma={
+  {0,{RightShoulder={-.15,0,.18}}},
+  {.18,{RightShoulder={-1.25,0,.18},RightElbow={-.9},LeftShoulder={-.9,0,-.5},RootJoint={.12}}},
+  {.38,{RightShoulder={-1.55,0,.1},RightElbow={-.5},RootJoint={.08}}},
+  {.42,{RightShoulder={-1.55,0,.1},RightElbow={-.03},RootJoint={-.1}}},
+  {.65,{RightShoulder={-1.2,0,.18},RightElbow={-.25},RootJoint={.02}}},
+  {1,{RightShoulder={-.15,0,.18}}}},
+ claw={
+  {0,{RightShoulder={0,0,.09}}},
+  {.12,{RightShoulder={-.65,-.2,-.45},LeftShoulder={-.45,0,-.3},RootJoint={0,-.2}}},
+  {.22,{RightShoulder={-1.4,.35,.5},LeftShoulder={-.6,0,-.2},RootJoint={-.16,.3}}},
+  {.38,{RightShoulder={-.4,.1,.65},RootJoint={-.08,.2}}},
+  {.6,{RightShoulder={0,0,.09}}}}}
+local function clipPose(action,time)
+ local frames=clips[action];if not frames then return nil end
+ local a,b=frames[1],frames[#frames]
+ for index=2,#frames do if time<=frames[index][1] then a,b=frames[index-1],frames[index];break end end
+ local t=smooth((time-a[1])/math.max(.001,b[1]-a[1]));local pose={}
+ for name,value in pairs(a[2]) do pose[name]=mix(value,b[2][name] or rot(),t) end
+ for name,value in pairs(b[2]) do if not pose[name] then pose[name]=mix(a[2][name] or rot(),value,t) end end
+ return pose
+end
 local function bodyAxes(pose)
  -- Clips describe arm flexion as negative; Roblox's downward limbs need +X
  -- to reach toward -Z (forward). Hips/root already use body-space axes.
@@ -47,6 +102,14 @@ function Motion.sample(id,state,phase,speed,action,elapsed,context)
  if not moving then
   pose.LeftShoulder=rot(math.sin(t)*.035,0,-.025);pose.RightShoulder=rot(-math.sin(t)*.035,0,.025)
   pose.RootJoint=rot(0,0,0,0,math.sin(t*.7)*p.bob*.5)
+  if id=="pelotocino" then pose.RootJoint[3]=math.sin(t*.23)*.025;pose.Neck[2]=math.sin(t*.17)*.09
+  elseif id=="tubers93" then pose.RootJoint[2]=math.sin(t*.2)*.035;pose.Neck[1]=.045
+  elseif id=="guest666" then pose.RootJoint[1]=-.025;pose.RootJoint[3]=math.sin(t*.18)*.012 end
+ else
+  pose.RootJoint[2]=math.sin(t)*.045*strength
+  pose.Neck[2]=-pose.RootJoint[2]*.45
+  pose.LeftHip[3]=math.sin(t)*.025*strength;pose.RightHip[3]=-pose.LeftHip[3]
+  if state=="sprint" then pose.RootJoint[1]=pose.RootJoint[1]-.045;pose.LeftElbow[1]=-.65;pose.RightElbow[1]=-.65 end
  end
  if id=="yellowguy" then pose.RightShoulder=rot(-stride*.25-.12,0,.08)
  elseif id=="junkbot" then pose.LeftElbow=rot(-.3);pose.RightElbow=rot(-.3);pose.Neck=rot(.035,math.sin(t*.17)*.06)
@@ -113,6 +176,7 @@ function Motion.sample(id,state,phase,speed,action,elapsed,context)
  elseif action=="grabbed" or action=="pinned" then target.RootJoint=rot(-.55,0,.1);target.LeftShoulder=rot(-1.3,0,-.35);target.RightShoulder=rot(-1.3,0,.35)
  elseif action=="escape" then target.RootJoint=rot(-.25);target.LeftShoulder=rot(-1.3,0,-.6);target.RightShoulder=rot(.7,0,.6)
  elseif action=="luckyBacon" then target.RightShoulder=rot(-1.8,0,-.2) end
+ target=clipPose(action,elapsed) or target
  for joint,value in pairs(target) do pose[joint]=mix(pose[joint] or rot(),value,fade) end
  return bodyAxes(pose)
 end

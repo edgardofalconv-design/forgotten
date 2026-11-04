@@ -100,7 +100,7 @@ def normalize(s):
     s=re.sub(r'for (_,\w+) in (\{[^\n]+?\}) do',r'for \1 in ipairs(\2) do',s)
     return s.replace('pocket.CFrame*=CFrame.Angles(0,0,math.pi/2)','pocket.CFrame=pocket.CFrame*CFrame.Angles(0,0,math.pi/2)')
 def main():
-    out=ROOT/'dist/preview-scene-v3.json'
+    out=ROOT/'dist/preview-scene-v4.json'
     roster=(ROOT/'src/shared/Roster.luau').read_text()
     source=normalize((ROOT/'src/shared/Lobby.luau').read_text())
     appearance=(ROOT/'src/shared/Appearance.luau').read_text()

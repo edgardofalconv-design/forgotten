@@ -176,7 +176,7 @@ def syntax_check():
         run_lua(source, 'sintaxis adaptada: '+str(path.relative_to(ROOT)), execute=False)
 
 
-def check_export(target='Forgotten-V3.rbxlx'):
+def check_export(target='Forgotten-V4.rbxlx'):
     tree=ET.parse(ROOT/'dist'/target)
     scripts={n.find("Properties/string[@name='Name']").text:n for n in tree.findall('.//Item') if n.attrib['class'] in ['Script','LocalScript','ModuleScript']}
     assert 'Game' in scripts and 'UI' in scripts

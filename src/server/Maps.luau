@@ -73,12 +73,12 @@ function Maps.build(parent,definition,World)
   for i=1,count do p("Escalón",Vector3.new(7,i*height/count,1.6),x,i*height/count/2,z+(i-1)*1.6,accent,Enum.Material.Metal) end
   return z+(count-1)*1.6
  end
- p("Suelo estructural",Vector3.new(262,2,262),0,-1,0,ground,Enum.Material[palette.material])
- for _,x in ipairs({-121,121}) do p("Límite lateral",Vector3.new(2,30,244),x,15,0,wall) end
- p("Límite norte",Vector3.new(244,30,2),0,15,-121,wall)
- for _,x in ipairs({-67,67}) do p("Límite sur",Vector3.new(108,30,2),x,15,121,wall) end
- p("Camino transversal",Vector3.new(238,.07,13),0,.04,0,ground:Lerp(Color3.fromRGB(167,159,141),.3),Enum.Material.Concrete,true)
- p("Camino central",Vector3.new(13,.07,238),0,.05,0,ground:Lerp(Color3.fromRGB(167,159,141),.3),Enum.Material.Concrete,true)
+ p("Suelo estructural",Vector3.new(404,2,404),0,-1,0,ground,Enum.Material[palette.material])
+ for _,x in ipairs({-191,191}) do p("Límite lateral",Vector3.new(2,30,384),x,15,0,wall) end
+ p("Límite norte",Vector3.new(384,30,2),0,15,-191,wall)
+ for _,x in ipairs({-102,102}) do p("Límite sur",Vector3.new(178,30,2),x,15,191,wall) end
+ p("Camino transversal",Vector3.new(378,.07,13),0,.04,0,ground:Lerp(Color3.fromRGB(167,159,141),.3),Enum.Material.Concrete,true)
+ p("Camino central",Vector3.new(13,.07,378),0,.05,0,ground:Lerp(Color3.fromRGB(167,159,141),.3),Enum.Material.Concrete,true)
  local titles={island={"REFUGIO DEL FARO","ALMACÉN DEL MUELLE","ESTACIÓN COSTERA","RADIO DE EMERGENCIA"},pizza={"COMEDOR","COCINA","ESCENARIO","ALMACÉN"},heights={"TORRE NORTE","OFICINAS","ARCHIVO","TORRE SUR"},lab={"CULTIVOS","CUARENTENA","REACTOR","OBSERVACIÓN"},manor={"BIBLIOTECA","COMEDOR","SALÓN","GALERÍA"},town={"CASA ROJA","CASA AZUL","TALLER","CENTRO VECINAL"},factory={"MONTAJE","FUNDICIÓN","REPUESTOS","EMBALAJE"},arcade={"RETRO ZONE","PIXEL HALL","GLITCH ROOM","BACKSTAGE"},arena={"VESTUARIO A","VESTUARIO B","TÚNEL OESTE","TÚNEL ESTE"}}
  for i,position in ipairs(generators) do
   local x,z=position.X,position.Z
@@ -153,10 +153,12 @@ function Maps.build(parent,definition,World)
   end end
  end
  for _,x in ipairs({-108,108}) do for _,z in ipairs({-90,0,90}) do lamp(x,z) end end
- sign(definition.name:upper(),0,12,-116,34)
- local gate=p("Puerta de salida",Vector3.new(26,12,1.2),0,6,121,Color3.fromRGB(112,44,39))
+ local expansion=require(script.Parent.MapExpansion).extend(model,definition,{part=p,sign=sign,building=building,crate=crate,tableAt=tableAt,lamp=lamp,stairs=stairs},palette)
+ generators=expansion.generatorPositions;puzzles=expansion.puzzlePositions
+ sign(definition.name:upper(),0,12,-186,34)
+ local gate=p("Puerta de salida",Vector3.new(26,12,1.2),0,6,191,Color3.fromRGB(112,44,39))
  local gateText=World.label(gate,"SALIDA CERRADA")
- local exit=p("Umbral fisico de escape",Vector3.new(24,10,6),0,5,127,Color3.fromRGB(62,189,121),Enum.Material.Neon,true)
+ local exit=p("Umbral fisico de escape",Vector3.new(24,10,6),0,5,197,Color3.fromRGB(62,189,121),Enum.Material.Neon,true)
  exit.Transparency=.8;exit.CanTouch=true
  local function setGate(open,mode)
   gate.CanCollide=not open;gate.Transparency=open and .88 or 0
@@ -164,7 +166,7 @@ function Maps.build(parent,definition,World)
  end
  setGate(false,"Normal")
  return {arena=model,center=center,gate=gate,exit=exit,setGate=setGate,mapId=definition.id,mapName=definition.name,
-  generatorPositions=generators,puzzlePositions=puzzles,depotPosition=Vector3.new(0,0,102),
+  generatorPositions=generators,puzzlePositions=puzzles,depotPosition=Vector3.new(0,0,172),playableHalf=186,pointsOfInterest=expansion.points,
   survivorSpawn=Vector3.new(-90,0,-108),killerSpawn=Vector3.new(100,0,100),
   itemSpawns={Vector3.new(-104,0,-48),Vector3.new(104,0,48),Vector3.new(20,0,-100),Vector3.new(-20,0,100),Vector3.new(-12,0,24),Vector3.new(24,0,-24)}}
 end

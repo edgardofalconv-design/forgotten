@@ -1,9 +1,11 @@
 local Data=require(script.Parent.CharacterVisualData)
 local Geometry=require(script.Parent.VisualGeometry)
+local Proportions=require(script.Parent.RigProportions)
+local Faces=require(script.Parent.FaceData)
 local Visuals={}
 local palettes={
  pelotocino={skin={237,235,226},torso={18,21,25},legs={25,30,32}},
- yellowguy={skin={245,205,48},torso={13,105,172},legs={75,151,75}},
+ yellowguy={skin={245,205,48},torso={17,20,24},legs={23,26,31}},
  guest666={skin={12,13,17},torso={13,15,19},legs={14,16,20}},
  tubers93={skin={221,219,208},torso={16,18,22},legs={24,28,31}},
  junkbot={skin={157,134,51},torso={66,72,64},legs={63,69,63}},
@@ -20,13 +22,20 @@ function Visuals.anchor(model,name,specName)
  return model:FindFirstChild(specName and specName:find("Hombrera") and upper or lower)
 end
 local function surface(part,name)
- local gui=Instance.new("SurfaceGui");gui.Name=name;gui.Face=Enum.NormalId.Front;gui.CanvasSize=Vector2.new(512,512);gui.Parent=part
+ local old=part:FindFirstChild(name.."Mount");if old then old:Destroy() end
+ -- Keep the artwork outside the native Head mesh and the shaped body surface.
+ local host=Instance.new("Part");host.Name=name.."Mount";host.Size=Vector3.new(part.Size.X,part.Size.Y,.01)
+ host.Transparency=1;host.CanCollide=false;host.CanTouch=false;host.CanQuery=false;host.Massless=true;host.CastShadow=false
+ host.CFrame=part.CFrame*CFrame.new(0,0,-part.Size.Z/2-(part.Name=="Head" and .14 or .018));host.Parent=part
+ local weld=Instance.new("WeldConstraint");weld.Part0=part;weld.Part1=host;weld.Parent=host
+ local gui=Instance.new("SurfaceGui");gui.Name=name;gui.Face=Enum.NormalId.Front;gui.CanvasSize=Vector2.new(512,512);gui.Parent=host
  return gui
 end
 local function panel(gui,pos,size,color)
  local f=Instance.new("Frame");f.BorderSizePixel=0;f.Position=UDim2.fromScale(pos[1],pos[2]);f.Size=UDim2.fromScale(size[1],size[2]);f.BackgroundColor3=rgb(color);f.Parent=gui;return f
 end
 function Visuals.apply(model,id)
+ Proportions.apply(model,id)
  local old=model:FindFirstChild("ForgottenAppearance");if old then old:Destroy() end
  local folder=Instance.new("Folder");folder.Name="ForgottenAppearance";folder.Parent=model
  local palette=palettes[id];local head=model:FindFirstChild("Head");local torso=Visuals.anchor(model,"Torso")
@@ -45,17 +54,25 @@ function Visuals.apply(model,id)
    head.Size=Vector3.new(2,1,1)
    local mesh=Instance.new("SpecialMesh");mesh.MeshType=Enum.MeshType.Head;mesh.Scale=Vector3.new(1.25,1.25,1.25);mesh.Parent=head
   end
-  if id=="pelotocino" or id=="yellowguy" or id=="tubers93" then
+  if id=="pelotocino" or id=="tubers93" then
    local face=Instance.new("Decal");face.Name="ClassicSmile";face.Face=Enum.NormalId.Front;face.Texture="rbxasset://textures/face.png";face.Parent=head
+  elseif id=="yellowguy" then
+   local gui=surface(head,"RostroYellowGuy")
+   for _,feature in ipairs(Faces.yellowguy) do
+    local shape=panel(gui,feature.position,feature.size,feature.color);shape.Name=feature.name;shape.Rotation=feature.rotation
+   end
   elseif id=="guest666" then
    local gui=surface(head,"OjosGuest")
    for _,x in ipairs({.35,.59}) do local eye=panel(gui,{x,.37},{.06,.14},{217,20,34});local round=Instance.new("UICorner");round.CornerRadius=UDim.new(1,0);round.Parent=eye end
   else head.Transparency=1 end
  end
- if id=="pelotocino" or id=="tubers93" then
+ if id=="pelotocino" or id=="tubers93" or id=="yellowguy" then
   local shirt=surface(torso,"CamisetaYChaqueta")
-  panel(shirt,{.3,.02},{.4,.96},{14,102,157})
+  panel(shirt,{.3,.02},{.4,.96},id=="yellowguy" and {24,141,202} or {14,102,157})
   for _,x in ipairs({.24,.72}) do local lapel=panel(shirt,{x,.03},{.07,.58},{43,47,49});lapel.Rotation=x<.5 and -10 or 10 end
+  if id=="yellowguy" then
+   panel(shirt,{.43,.3},{.045,.2},{25,61,74});panel(shirt,{.43,.3},{.14,.04},{25,61,74});panel(shirt,{.43,.38},{.1,.035},{25,61,74})
+  end
  elseif id=="guest666" then
   local gui=surface(torso,"CamisetaGuest")
   local text=Instance.new("TextLabel");text.Size=UDim2.fromScale(.94,.27);text.Position=UDim2.fromScale(.03,.25);text.BackgroundTransparency=1
@@ -71,10 +88,10 @@ function Visuals.apply(model,id)
    if anchor then
     if spec.body then anchor.Transparency=1 end
     local group=Geometry.build(folder,anchor,spec);group:SetAttribute("VisualSpecIndex",index)
-    if id=="yellowguy" and not spec.name:find("CombatMark") then group:SetAttribute("WeaponKind","cane") end
+    if spec.weapon=="cane" then group:SetAttribute("WeaponKind","cane") end
    end
   end
  end
- model:SetAttribute("VisualVersion",3);model:SetAttribute("GeometryBackend","Native shapes + authored surfaces")
+ model:SetAttribute("VisualVersion",4);model:SetAttribute("GeometryBackend","Native shapes + authored surfaces")
 end
 return Visuals

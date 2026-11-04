@@ -73,7 +73,8 @@ function Abilities:ray(player,direction,range)
 end
 function Abilities:teleport(player,point,look)
  local center=self.c.world.center
- if math.abs(point.X-center.X)>116 or math.abs(point.Z-center.Z)>116 then return false end
+ local limit=self.c.world.playableHalf or 116
+ if math.abs(point.X-center.X)>limit or math.abs(point.Z-center.Z)>limit then return false end
  local ignore={}
  for other in pairs(self.c.records()) do if other.Character then table.insert(ignore,other.Character) end end
  local params=RaycastParams.new();params.FilterType=Enum.RaycastFilterType.Exclude;params.FilterDescendantsInstances=ignore
@@ -184,7 +185,7 @@ function Abilities:cast(player,slot,aim)
   end)
  elseif kind=="ray" or kind=="blast" then
   local other,point=self:ray(player,direction,ability.range)
-  self.c.effect({kind="beam",position=root.Position,finish=point,color=kind=="blast" and "red" or "blue",duration=.35})
+  self.c.effect({kind="beam",ability=ability.id,model=player.Character,position=root.Position,finish=point,color=kind=="blast" and "red" or "blue",duration=.35})
   if kind=="blast" then
    self.c.effect({kind="burst",position=point,color="red",radius=12,duration=.6})
    for _,enemy in ipairs(self:enemies(player,ability.range+12,true)) do
@@ -250,6 +251,7 @@ function Abilities:tick()
     local channel=record.channel
     if (record.lastDamage or 0)>channel.started or (root.Position-channel.position).Magnitude>3 then record.channel=nil
     elseif now>=channel.untilTime then h.Health=math.min(h.MaxHealth,h.Health+channel.amount);record.channel=nil end
+    if not record.channel and player.Character and player.Character:GetAttribute("Action")=="selfRepair" then player.Character:SetAttribute("Action","") end
    end
   end
  end

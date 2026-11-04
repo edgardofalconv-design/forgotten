@@ -73,6 +73,9 @@ Stamina.step(energy,.5,true,true);assert(energy.value==100 and energy.running)
         +module('Roster.luau','roster')+'\nscript={Parent={Appearance=Appearance,ImportedAppearance=Imported,CatalogCharacter={clone=function()return nil end},AvatarCatalog={clone=function()return nil end}}}\nrequire=function(m)return m end\n'
         +module('CharacterVisualData.luau','VisualData')+'\nscript.Parent.CharacterVisualData=VisualData\n'
         +module('VisualGeometry.luau','Geometry')+'\nscript.Parent.VisualGeometry=Geometry\n'
+        +module('RigProfileData.luau','RigProfiles')+'\nscript.Parent.RigProfileData=RigProfiles\n'
+        +module('RigProportions.luau','Proportions')+'\nscript.Parent.RigProportions=Proportions\n'
+        +module('FaceData.luau','Faces')+'\nscript.Parent.FaceData=Faces\n'
         +module('CharacterVisuals.luau','Visuals')+'\nscript.Parent.CharacterVisuals=Visuals\n'
         +module('CharacterFactory.luau','Factory')+FACTORY_TESTS+module('Cosmetics.luau','Cosmetics')+r'''
 for _,entry in ipairs(roster) do for tier=0,4 do
@@ -240,7 +243,9 @@ assert(rules.puzzleCount==1 and rewards==2 and rules.remaining==225)
 o:answer(p2,oldToken,1);assert(not o.sessions[p2] and rewards==2)
 o.stations[1].pickup.Triggered:Fire(p1);o.stations[1].pickup.Triggered:Fire(p2)
 assert(rules:carried(1)==1 and rules:carried(2)==0 and rules.capsuleCount==0)
+for _,piece in ipairs(o.stations[1].capsuleParts)do assert(piece.Transparency==1)end
 o:drop(p1);assert(rules:carried(1)==0 and o.stations[1].pickup.Enabled)
+for _,piece in ipairs(o.stations[1].capsuleParts)do assert(piece.Transparency==0)end
 o.stations[1].pickup.Triggered:Fire(p2)
 o.prompts[#o.prompts].Triggered:Fire(p2)
 assert(rules.capsuleCount==1 and rules:carried(2)==0)
@@ -378,10 +383,12 @@ for index,definition in ipairs(Catalog) do
  assert(world.center.Z==600 and world.gate.CanCollide)
  world.setGate(true,"Normal");assert(not world.gate.CanCollide)
  world.setGate(false,"LMS");assert(world.gate.CanCollide)
- local positions={world.survivorSpawn,world.killerSpawn,world.depotPosition,Vector3.new(0,0,117)}
+ local positions={world.survivorSpawn,world.killerSpawn,world.depotPosition,Vector3.new(0,0,world.gate.Position.Z-world.center.Z-4)}
+ assert(world.playableHalf==186 and #world.pointsOfInterest==4)
+ for _,point in ipairs(world.pointsOfInterest) do table.insert(positions,point.position) end
  for _,list in ipairs({world.generatorPositions,world.puzzlePositions,world.itemSpawns}) do for _,p in ipairs(list) do table.insert(positions,p) end end
  if index>1 then output:write(',') end
- output:write('{"id":',quote(definition.id),',"points":[')
+ output:write('{"id":',quote(definition.id),',"half":',tostring(world.playableHalf+2),',"points":[')
  for i,p in ipairs(positions) do if i>1 then output:write(',')end;output:write(json({p.X,p.Z}))end
  output:write('],"parts":[')
  local first=true;local count=0
@@ -392,12 +399,12 @@ for index,definition in ipairs(Catalog) do
    output:write(json({n.Position.X,n.Position.Y,n.Position.Z-world.center.Z,n.Size.X,n.Size.Y,n.Size.Z}))
   end
  end end
- assert(count>120 and count<800)
+ assert(count>300 and count<1100)
  output:write('],"count":',tostring(count),'}')
 end
 output:write(']');output:close()
 '''.replace('PATH',repr(target))
-    run_lua(MOCK+COMMON+WORLD+module('MapCatalog.luau','Catalog')+server('Maps.luau','Maps')+tests,'nueve mapas: constructores, geometría, objetivos, objetos y salida')
+    run_lua(MOCK+COMMON+WORLD+module('MapCatalog.luau','Catalog')+server('MapExpansion.luau','Expansion')+'\nscript.Parent.MapExpansion=Expansion\n'+server('Maps.luau','Maps')+tests,'nueve mapas: constructores, distritos V4, geometría, objetivos, objetos y salida')
     summaries=[]
     for layout in json.loads(open(target).read()):
         # Conservative 2D navigation test at body height with 1.5-stud radius.
@@ -405,7 +412,14 @@ output:write(']');output:close()
         step=2
         def blocked(x,z):
             return any(abs(x-p[0])<p[3]/2+1.5 and abs(z-p[2])<p[5]/2+1.5 for p in obstacles)
-        cells={(x,z) for x in range(-118,119,step) for z in range(-118,119,step) if not blocked(x,z)}
+        half=layout['half']
+        # Rasterize conservative obstacle bounds instead of testing every cell
+        # against every part. Same 1.5-stud clearance, appropriate for larger maps.
+        cells={(x,z) for x in range(-half,half+1,step) for z in range(-half,half+1,step)}
+        for p in obstacles:
+            for x in range(max(-half,int((p[0]-p[3]/2-1.5)//step)*step),min(half,int((p[0]+p[3]/2+1.5)//step)*step)+1,step):
+                for z in range(max(-half,int((p[2]-p[5]/2-1.5)//step)*step),min(half,int((p[2]+p[5]/2+1.5)//step)*step)+1,step):
+                    if abs(x-p[0])<p[3]/2+1.5 and abs(z-p[2])<p[5]/2+1.5:cells.discard((x,z))
         start=tuple(layout['points'][0]);assert start in cells,(layout['id'],'spawn blocked')
         seen={start};queue=deque([start])
         while queue:

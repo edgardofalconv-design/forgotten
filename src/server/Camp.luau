@@ -1,6 +1,6 @@
 local Camp={}
 function Camp.extend(world,remote,World)
- local camp=Instance.new("Model");camp.Name="ClubHouseYCampamentoV2";camp.Parent=world
+ local camp=Instance.new("Model");camp.Name="ClubHouseYCampamentoV4";camp.Parent=world
  local wood=Color3.fromRGB(91,67,47);local stone=Color3.fromRGB(95,101,95);local amber=Color3.fromRGB(230,173,89)
  local function p(name,size,x,y,z,tint,material,decor)
   local part=World.part(camp,name,size,Vector3.new(x,y,z),tint or wood,material or Enum.Material.WoodPlanks)
@@ -42,6 +42,22 @@ function Camp.extend(world,remote,World)
    p("Hierba del sendero",Vector3.new(2,.9,2),x,-.4,z,Color3.fromRGB(57,74,49),Enum.Material.Grass,true)
    p("Roca erosionada",Vector3.new(3.5,2.3,3),x+3,.2,z-3,stone,Enum.Material.Slate)
   end
+ end
+ -- Inhabited-looking refuge details; paths and existing interactions remain clear.
+ for _,x in ipairs({-64,64}) do
+  local board=p("Tablón de expediciones",Vector3.new(7,4,.22),x-7,5,-45.7,stone,nil,true)
+  World.label(board,"EXPEDICIONES\nNADIE REGRESA IGUAL")
+  p("Alfombra gastada",Vector3.new(8,.04,6),x,.54,-58,Color3.fromRGB(72,79,63),Enum.Material.Fabric,true)
+  p("Suministros cerrados",Vector3.new(3,2,2.4),x+7,1.5,-49,stone,Enum.Material.Metal)
+  for i=1,3 do p("Tabla reforzada",Vector3.new(.14,2.1,2.45),x+6+i*.45,1.5,-49,wood,Enum.Material.Wood,true) end
+ end
+ for _,side in ipairs({-1,1}) do
+  for i=1,9 do p("Pasarela de madera",Vector3.new(8,.12,1.7),side*34,-.76,-76+i*1.8,wood:Lerp(stone,i%3*.1),Enum.Material.WoodPlanks,true) end
+ end
+ for i=1,5 do
+  local angle=i/5*math.pi*2
+  local rock=p("Piedra lisa de fogata",Vector3.new(2,.7,1.4),24+math.cos(angle)*4.5,.25,-53+math.sin(angle)*4.5,stone,Enum.Material.Slate,true)
+  rock.Shape=Enum.PartType.Ball
  end
  return camp
 end

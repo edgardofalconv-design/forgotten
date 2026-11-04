@@ -36,7 +36,7 @@ local function template(id,index,spec)
  cache[key]=result;return result
 end
 function Renderer.apply(model)
- if disabled or model:GetAttribute("VisualVersion")~=3 or model:FindFirstChild("ClientVisualMeshes") then return end
+ if disabled or (model:GetAttribute("VisualVersion") or 0)<3 or model:FindFirstChild("ClientVisualMeshes") then return end
  local id=model:GetAttribute("CharacterIdentity");local source=Data[id]
  local original=model:FindFirstChild("ForgottenAppearance")
  if not source or not original then return end

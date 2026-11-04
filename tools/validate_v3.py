@@ -17,6 +17,8 @@ def protect():
     return checked
 
 def main():
+    if (ROOT/'src/shared/RigProportions.luau').exists():
+        raise SystemExit('V3 protegida: las fuentes actuales son V4. No se sobrescribirá V3.')
     DIST.mkdir(exist_ok=True)
     protected=protect()
     tasks=[('authored_geometry',[sys.executable,'tools/build_character_visuals_v3.py']),

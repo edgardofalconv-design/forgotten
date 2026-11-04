@@ -9,8 +9,27 @@ function Items.new(world,context)
   local kind=i%2==1 and "medkit" or "energyDrink"
   local color=kind=="medkit" and Color3.fromRGB(176,57,53) or Color3.fromRGB(73,166,116)
   local part=World.part(self.folder,Config[kind].name,kind=="medkit" and Vector3.new(2.2,1.4,1.6) or Vector3.new(.9,1.7,.9),world.center+pos+Vector3.new(0,1.2,0),color,Enum.Material.Metal)
-  if kind=="energyDrink" then part.Shape=Enum.PartType.Cylinder end
-  World.label(part,kind=="medkit" and "+ MEDKIT" or "ENERGY")
+  part.CanCollide=false;part.CanTouch=false
+  local function detail(name,size,offset,tint,shape)
+   local piece=World.part(part,name,size,part.Position+offset,tint,Enum.Material.Metal)
+   piece.CanCollide=false;piece.CanTouch=false;piece.CanQuery=false;piece.CastShadow=false
+   if shape then piece.Shape=shape;piece.CFrame=piece.CFrame*CFrame.Angles(0,0,math.pi/2) end
+   return piece
+  end
+  local white=Color3.fromRGB(225,226,214);local dark=Color3.fromRGB(49,56,59)
+  if kind=="energyDrink" then
+   part.Size=Vector3.new(1.7,.9,.9);part.Shape=Enum.PartType.Cylinder;part.CFrame=part.CFrame*CFrame.Angles(0,0,math.pi/2)
+   for _,y in ipairs({-.84,.84}) do detail("Borde de lata",Vector3.new(.06,.94,.94),Vector3.new(0,y,0),white,Enum.PartType.Cylinder) end
+   detail("Anilla",Vector3.new(.15,.035,.28),Vector3.new(0,.89,0),dark)
+   local label=detail("Etiqueta de bebida",Vector3.new(.66,.85,.025),Vector3.new(0,0,-.46),dark)
+   World.label(label,"ENERGY")
+  else
+   detail("Cruz vertical",Vector3.new(.25,.75,.03),Vector3.new(0,0,-.82),white)
+   detail("Cruz horizontal",Vector3.new(.75,.25,.03),Vector3.new(0,0,-.82),white)
+   for _,x in ipairs({-.8,.8}) do detail("Correa del botiquín",Vector3.new(.13,1.44,1.64),Vector3.new(x,0,0),dark) end
+   for _,x in ipairs({-.4,.4}) do detail("Soporte de asa",Vector3.new(.12,.35,.12),Vector3.new(x,.85,0),dark) end
+   detail("Asa del botiquín",Vector3.new(.9,.12,.16),Vector3.new(0,1.03,0),dark)
+  end
   local prompt=Instance.new("ProximityPrompt");prompt.ActionText="Recoger";prompt.ObjectText=Config[kind].name;prompt.MaxActivationDistance=9;prompt.Parent=part
   local claimed=false
   table.insert(self.connections,prompt.Triggered:Connect(function(player)

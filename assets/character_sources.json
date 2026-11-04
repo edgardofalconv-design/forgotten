@@ -1,10 +1,10 @@
 {
   "active": {
     "pelotocino": {
-      "status": "native_r6_with_authored_v3",
-      "reference": "Bacon con mochila",
+      "status": "native_r6_with_authored_v4",
+      "reference": "Bacon delgado con ropa negra y azul, cara clásica y mochila",
       "legacy_mesh": "dist/reference-characters/pelotocino/pelotocino.fbx",
-      "authored_geometry": "assets/v3/character-geometry.json",
+      "authored_geometry": "assets/v4/character-geometry.json",
       "runtime_catalog_hair": {
         "name": "Pal Hair",
         "creator": "Roblox",
@@ -12,24 +12,24 @@
       }
     },
     "yellowguy": {
-      "status": "native_r6_with_authored_v3",
-      "reference": "Avatar clásico amarillo con bastón",
+      "status": "native_r6_with_authored_v4",
+      "reference": "Piel amarilla; delgado; cabello dorado elevado y lateral; rostro serio; chaqueta negra abierta, camiseta azul, pantalones oscuros y bastón. Dirección visual escrita por el usuario.",
       "legacy_mesh": null,
-      "authored_geometry": "assets/v3/character-geometry.json"
+      "authored_geometry": "assets/v4/character-geometry.json"
     },
     "junkbot": {
-      "status": "official_catalog_or_authored_v3",
+      "status": "official_catalog_or_authored_v4",
       "bundle_id": 589,
       "url": "https://www.roblox.com/es/bundles/589/Junkbot",
       "legacy_robot_mesh": "dist/reference-characters/yellowguy/yellowguy.fbx",
       "legacy_mesh_is_original": false,
-      "authored_geometry": "assets/v3/character-geometry.json"
+      "authored_geometry": "assets/v4/character-geometry.json"
     },
     "deathspeaker": {
-      "status": "official_catalog_or_authored_v3",
+      "status": "official_catalog_or_authored_v4",
       "reference": "Korblox Deathspeaker clásico",
       "legacy_mesh": "dist/reference-characters/deathspeaker/deathspeaker.fbx",
-      "authored_geometry": "assets/v3/character-geometry.json",
+      "authored_geometry": "assets/v4/character-geometry.json",
       "runtime_catalog_body": {
         "name": "Korblox Deathspeaker",
         "creator": "Roblox",
@@ -37,16 +37,16 @@
       }
     },
     "guest666": {
-      "status": "native_r6_with_authored_v3",
+      "status": "native_r6_with_authored_v4",
       "reference": "Avatar oscuro con ojos rojos",
       "legacy_mesh": "dist/reference-characters/guest666/guest666.fbx",
-      "authored_geometry": "assets/v3/character-geometry.json"
+      "authored_geometry": "assets/v4/character-geometry.json"
     },
     "tubers93": {
-      "status": "native_r6_with_authored_v3",
+      "status": "native_r6_with_authored_v4",
       "reference": "Avatar oscuro con guadaña",
       "legacy_mesh": "dist/reference-characters/tubers93/tubers93.fbx",
-      "authored_geometry": "assets/v3/character-geometry.json",
+      "authored_geometry": "assets/v4/character-geometry.json",
       "runtime_catalog_hair": {
         "name": "Pal Hair",
         "creator": "Roblox",
@@ -58,5 +58,5 @@
     "baller"
   ],
   "studio_verified": false,
-  "note": "V3 usa geometría propia y búsqueda oficial en tiempo de ejecución. Catálogo real y Studio sin verificar aquí. Los FBX históricos siguen siendo aproximaciones; el antiguo yellowguy es un robot y nunca se equipa a Yellow Guy."
+  "note": "V4 usa geometría propia y búsqueda oficial en tiempo de ejecución. No se inventan AssetIds. Catálogo real y Studio sin verificar aquí. Las alternativas de Junkbot y Deathspeaker no son los cuerpos originales. Los FBX históricos siguen siendo aproximaciones; el antiguo yellowguy es un robot y nunca se equipa a Yellow Guy."
 }

@@ -122,7 +122,7 @@ def effects():
     setup=r'''
 local previousWrite=omt.__newindex
 omt.__newindex=function(o,k,v)
- if k=="Position" or k=="Size" then assert(getmetatable(v)==vmt,"Expected Vector3: "..k) end
+ if k=="Position" or k=="Size" and (o.ClassName=="Part" or o.ClassName=="WedgePart" or o.ClassName=="MeshPart") then assert(getmetatable(v)==vmt,"Expected Vector3: "..k) end
  previousWrite(o,k,v)
 end
 local previousRead=omt.__index
@@ -132,8 +132,11 @@ omt.__index=function(o,k)
 end
 ColorSequence={new=function(c)return c end}
 NumberSequence={new=function(v)return v end};NumberSequenceKeypoint={new=function(t,v)return {t,v}end}
+NumberRange={new=function(a,b)return {a,b}end}
 TweenInfo={new=function(d)return d end}
 local cleanup={};local delays={}
+local originalRead=omt.__index
+omt.__index=function(o,k)if k=="Emit" then return function(_,count)assert(count>0 and count<=20)end end;return originalRead(o,k)end
 task.delay=function(d,fn)table.insert(delays,fn)end
 services.Debris={AddItem=function(_,item,d)assert(d>0);table.insert(cleanup,item)end}
 services.TweenService={Create=function()return {Play=function()end}end}
@@ -145,6 +148,8 @@ script={Parent={Music={sfx={}}}}
 local fx=CreateEffects(function()return true end)
 local actor=Instance.new("Model");actor.Parent=workspace
 local hand=Instance.new("Part");hand.Name="Right Arm";hand.CFrame=CFrame.new(0,3,0);hand.Parent=actor
+local torso=Instance.new("Part");torso.Name="Torso";torso.CFrame=CFrame.new(0,3,0);torso.Parent=actor
+for _,ability in ipairs({"plasma","overdrive","selfRepair"}) do fx.effect({kind="skill",ability=ability,model=actor,position=Vector3.new(0,3,0)}) end
 for _,ability in ipairs({"scythe","spin","cane","pan","claw","punch"}) do
  fx.effect({kind="melee",ability=ability,model=actor,position=Vector3.new(),color="red"})
 end
@@ -163,6 +168,7 @@ for _,n in ipairs(nodes)do if n.ClassName=="Model" and n.Name and n.Name:find("P
  flying=flying+1;assert(n.PrimaryPart.Position.Y>3 and math.abs(n.PrimaryPart.Position.Z+5)<.01)
  local expected=n.Name=="Proyectil_cane" and "Empuñadura curva" or "Mechón Bacon 0"
  assert(n:FindFirstChild(expected),"missing authored projectile geometry")
+ if n.Name=="Proyectil_cane" then assert(#n:GetChildren()==4,"cane projectile must not include the avatar or hair") end
 end end
 assert(flying==2 and #cleanup>=17)
 advance(.3);services.RunService.RenderStepped:Fire()

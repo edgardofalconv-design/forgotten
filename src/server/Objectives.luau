@@ -16,8 +16,8 @@ function Objectives.new(world,rules,callbacks)
   end)
   return p
  end
- local function decor(name,size,pos,tint)
-  local part=World.part(self.folder,name,size,pos,tint,Enum.Material.Neon)
+ local function decor(name,size,pos,tint,parent)
+  local part=World.part(parent or self.folder,name,size,pos,tint,Enum.Material.Neon)
   part.CanCollide=false;part.CanTouch=false;part.CanQuery=false;part.CastShadow=false;return part
  end
  for i,pos in ipairs(world.generatorPositions) do
@@ -29,18 +29,44 @@ function Objectives.new(world,rules,callbacks)
  local titles={"MEMORIA","PIANO","REFLEJOS","LABERINTO"}
  for i,pos in ipairs(world.puzzlePositions) do
   local base=World.part(self.folder,"Estacion de puzle "..i,Vector3.new(4,3,3),world.center+pos+Vector3.new(0,1.5,0),Color3.fromRGB(57,68,86))
-  World.label(base,"ESTACIÓN "..i.." · "..titles[i])
+  local marquee=decor("Cabecera de estación",Vector3.new(3.7,.65,.12),base.Position+Vector3.new(0,1.03,-1.59),Color3.fromRGB(33,45,50),base)
+  marquee.Material=Enum.Material.Metal
+  local stationLabel=World.label(marquee,titles[i])
+  if i==1 then
+   for pad=1,4 do decor("Pulsador de memoria",Vector3.new(.62,.62,.12),base.Position+Vector3.new((pad-2.5)*.8,-.1,-1.58),tones[pad],base) end
+  elseif i==2 then
+   for key=1,7 do
+    local white=decor("Tecla de piano",Vector3.new(.43,1.1,.14),base.Position+Vector3.new((key-4)*.47,-.2,-1.58),Color3.fromRGB(218,219,207),base);white.Material=Enum.Material.SmoothPlastic
+    if key%3~=0 then local black=decor("Tecla sostenida",Vector3.new(.22,.6,.1),base.Position+Vector3.new((key-3.6)*.47,.05,-1.7),Color3.fromRGB(24,29,32),base);black.Material=Enum.Material.SmoothPlastic end
+   end
+  elseif i==3 then
+   for lamp=1,3 do
+    local bulb=decor("Señal de reflejos",Vector3.new(.72,.72,.14),base.Position+Vector3.new((lamp-2),-.15,-1.6),tones[({1,3,4})[lamp]],base);bulb.Shape=Enum.PartType.Ball
+   end
+  else
+   for row=1,4 do for column=1,6 do
+    local tile=decor("Circuito del laberinto",Vector3.new(.44,.3,.08),base.Position+Vector3.new((column-3.5)*.49,.5-row*.34,-1.56),(row+column)%3==0 and tones[2] or Color3.fromRGB(37,56,66),base)
+    tile.Material=(row+column)%3==0 and Enum.Material.Neon or Enum.Material.Metal
+   end end
+  end
   local capsule=decor("Capsula "..i,Vector3.new(1,1.7,1),base.Position+Vector3.new(0,2.5,0),tones[2])
-  capsule.Shape=Enum.PartType.Cylinder;capsule.Transparency=.8
+  capsule.Size=Vector3.new(1.7,1,1);capsule.Shape=Enum.PartType.Cylinder;capsule.CFrame=capsule.CFrame*CFrame.Angles(0,0,math.pi/2)
+  local capsuleParts={capsule}
+  for _,offset in ipairs({-.9,.9}) do
+   local cap=decor("Anillo de cápsula",Vector3.new(.18,1.1,1.1),capsule.Position+Vector3.new(0,offset,0),Color3.fromRGB(126,143,148),capsule)
+   cap.Shape=Enum.PartType.Cylinder;cap.CFrame=cap.CFrame*CFrame.Angles(0,0,math.pi/2);cap.Material=Enum.Material.Metal;table.insert(capsuleParts,cap)
+  end
+  local function showCapsule(transparency)for _,piece in ipairs(capsuleParts) do piece.Transparency=transparency end end
+  showCapsule(.8)
   local pickup=prompt(capsule,"Llevar al depósito","Cápsula de energía",function(player,p)
    if rules:collectCapsule(i,player.UserId) then
-    p.Enabled=false;capsule.Transparency=1;player:SetAttribute("CarriedCapsules",rules:carried(player.UserId));callbacks.changed()
+    p.Enabled=false;showCapsule(1);player:SetAttribute("CarriedCapsules",rules:carried(player.UserId));callbacks.changed()
     callbacks.send(player,"message","Cápsula recogida. Llévala al depósito junto a la salida.")
    end
   end)
   pickup.Enabled=false
   local solve=prompt(base,"Abrir puzle",titles[i],function(player)self:open(player,"puzzle",i)end)
-  self.stations[i]={base=base,capsule=capsule,pickup=pickup,solve=solve,kind=kinds[i]}
+  self.stations[i]={base=base,capsule=capsule,pickup=pickup,solve=solve,kind=kinds[i],label=stationLabel,showCapsule=showCapsule,capsuleParts=capsuleParts}
  end
  local depot=World.part(self.folder,"Deposito de capsulas",Vector3.new(7,4,4),world.center+world.depotPosition+Vector3.new(0,2,0),tones[4])
  World.label(depot,"DEPÓSITO DE ENERGÍA\nENTREGA LAS CÁPSULAS AQUÍ")
@@ -91,7 +117,7 @@ function Objectives:answer(player,token,value)
     self.callbacks.changed()
    end
   elseif self.rules:completePuzzle(s.id) then
-   local station=self.stations[s.id];station.solve.Enabled=false;station.pickup.Enabled=true;station.capsule.Transparency=0
+   local station=self.stations[s.id];station.solve.Enabled=false;station.pickup.Enabled=true;station.showCapsule(0);station.label.Text="RESUELTO · RECOGE LA CÁPSULA"
    if self.callbacks.reward then self.callbacks.reward(player,"puzzle","puzzle:"..s.id) end
    self.callbacks.send(player,"message","Puzle resuelto. Recoge la cápsula y llévala al depósito.");self.callbacks.changed()
   end
@@ -107,7 +133,7 @@ end
 function Objectives:drop(player)
  self:cancel(player)
  for _,id in ipairs(self.rules:dropCapsules(player.UserId)) do
-  local station=self.stations[id];station.capsule.Transparency=0;station.pickup.Enabled=self.rules.mode~="LMS"
+  local station=self.stations[id];station.showCapsule(0);station.pickup.Enabled=self.rules.mode~="LMS"
  end
  player:SetAttribute("CarriedCapsules",0)
 end

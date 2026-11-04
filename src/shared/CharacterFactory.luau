@@ -76,7 +76,7 @@ local function placeholder(entry)
  model:SetAttribute("Placeholder",true)
  model:SetAttribute("ModelStatus","Provisional")
  if Imported.apply(model,entry.id,false) then model:SetAttribute("ModelStatus","Malla importada · pendiente de validar")
- else Visuals.apply(model,entry.id);model:SetAttribute("ModelStatus","Modelo propio V3 · provisional") end
+ else Visuals.apply(model,entry.id);model:SetAttribute("ModelStatus","Modelo propio V4 · provisional") end
  return model
 end
 
@@ -123,7 +123,7 @@ function Factory.create(entry)
      model:SetAttribute("Placeholder",false);model:SetAttribute("ModelStatus","Cuerpo original de Roblox · catálogo verificado")
     else
      Visuals.apply(model,entry.id)
-     model:SetAttribute("Placeholder",true);model:SetAttribute("ModelStatus",model:GetAttribute("OfficialBaconHair") and "Rig y cabello Roblox · vestuario propio V3" or "Rig Roblox · apariencia propia V3")
+     model:SetAttribute("Placeholder",true);model:SetAttribute("ModelStatus",model:GetAttribute("OfficialBaconHair") and "Rig y cabello Roblox · vestuario propio V4" or "Rig Roblox · apariencia propia V4")
     end
    else native:Destroy() end
   end
