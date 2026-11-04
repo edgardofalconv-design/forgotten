@@ -1,0 +1,84 @@
+resources
+Recursos históricos conservados y contenedores válidos: {'png': 30, 'fbx': 6, 'glb': 6}
+
+
+v2_behavior
+PASS: V2: reglas V1 + recoger/depositar/soltar cápsulas, LMS y bebida
+PASS: V2: seis rigs, articulaciones e identidades independientes
+PASS: economía: compras, saldos, inventario, 24 milestones y recibos repetidos
+PASS: persistencia simulada: sesión, bloqueo, guardado, liberación y fallo sin sobrescritura
+PASS: siete minijuegos: secuencias, reflejos, cuerda, interruptores y dos laberintos resolubles
+PASS: controlador objetivos: distancia, tokens, tres etapas, depósitos, abandonos y duplicados
+PASS: objetos y combate: ranuras, 7 s, cancelación, bebida 6 s, alcance, energía, escudos y cooldowns
+PASS: nueve mapas: constructores, geometría, objetivos, objetos y salida
+PASS: rutas 2D desde spawn a todos los objetivos, objetos y salida; piezas: disaster_island=178, pizza_place=191, forgotten_heights=182, research_facility=163, cursed_manor=268, forgotten_robloxia=167, junkbot_factory=163, corrupted_arcade=367, ballers_arena=126
+
+
+server_flow
+PASS: orquestación del servidor real con dobles: practice
+PASS: orquestación del servidor real con dobles: escape
+PASS: orquestación del servidor real con dobles: lms
+PASS: orquestación del servidor real con dobles: timeout
+PASS: orquestación del servidor real con dobles: killerLeaves
+
+
+import_fallback
+Tres casos de fallback pasan sin modificar avatar. No prueba física ni importación en Studio.
+
+
+catalog_native_rig
+Carga, caché, fallos, R6/R15, restauración, segunda ronda y limpieza: pasan con dobles Lua. Roblox pendiente.
+
+
+preview
+1767 piezas, 21 luces exportadas desde el constructor real. No es ejecución en Roblox.
+
+
+place_xml
+/workspace/forgotten/dist/Forgotten-V2.rbxlx: XML válido; 40 scripts y 1767 piezas de vista previa.
+
+
+syntax_and_embedded_sources
+PASS: sintaxis adaptada: src/client/init.client.luau
+PASS: sintaxis adaptada: src/server/Abilities.luau
+PASS: sintaxis adaptada: src/server/Camp.luau
+PASS: sintaxis adaptada: src/server/Maps.luau
+PASS: sintaxis adaptada: src/server/Objectives.luau
+PASS: sintaxis adaptada: src/server/ProfileService.luau
+PASS: sintaxis adaptada: src/server/RoundItems.luau
+PASS: sintaxis adaptada: src/server/World.luau
+PASS: sintaxis adaptada: src/server/init.server.luau
+PASS: sintaxis adaptada: src/shared/AbilityConfig.luau
+PASS: sintaxis adaptada: src/shared/AnimationConfig.luau
+PASS: sintaxis adaptada: src/shared/Appearance.luau
+PASS: sintaxis adaptada: src/shared/BasicAnimation.luau
+PASS: sintaxis adaptada: src/shared/CatalogCharacter.luau
+PASS: sintaxis adaptada: src/shared/ChallengeRules.luau
+PASS: sintaxis adaptada: src/shared/CharacterFactory.luau
+PASS: sintaxis adaptada: src/shared/ClientChallenge.luau
+PASS: sintaxis adaptada: src/shared/ClientEffects.luau
+PASS: sintaxis adaptada: src/shared/ClientMenus.luau
+PASS: sintaxis adaptada: src/shared/ClientMusic.luau
+PASS: sintaxis adaptada: src/shared/ClientPreview.luau
+PASS: sintaxis adaptada: src/shared/ClientResults.luau
+PASS: sintaxis adaptada: src/shared/ClientTheme.luau
+PASS: sintaxis adaptada: src/shared/Cosmetics.luau
+PASS: sintaxis adaptada: src/shared/EconomyConfig.luau
+PASS: sintaxis adaptada: src/shared/FutureRoster.luau
+PASS: sintaxis adaptada: src/shared/ImportedAppearance.luau
+PASS: sintaxis adaptada: src/shared/ItemConfig.luau
+PASS: sintaxis adaptada: src/shared/Lobby.luau
+PASS: sintaxis adaptada: src/shared/MapCatalog.luau
+PASS: sintaxis adaptada: src/shared/MaterialPack.luau
+PASS: sintaxis adaptada: src/shared/Music.luau
+PASS: sintaxis adaptada: src/shared/NativeRoundCharacter.luau
+PASS: sintaxis adaptada: src/shared/Portraits.luau
+PASS: sintaxis adaptada: src/shared/ProfileData.luau
+PASS: sintaxis adaptada: src/shared/RoleAssignment.luau
+PASS: sintaxis adaptada: src/shared/Roster.luau
+PASS: sintaxis adaptada: src/shared/RoundRules.luau
+PASS: sintaxis adaptada: src/shared/ShopCatalog.luau
+PASS: sintaxis adaptada: src/shared/Stamina.luau
+PASS: XML, jerarquía Rojo y todas las fuentes incrustadas
+
+No se ha ejecutado Roblox Studio. Lua 5.4 y APIs simuladas no sustituyen al motor.

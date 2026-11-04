@@ -1,0 +1,41 @@
+{
+  "active": {
+    "pelotocino": {
+      "status": "placeholder",
+      "reference": "Bacon con mochila",
+      "legacy_mesh": "dist/reference-characters/pelotocino/pelotocino.fbx"
+    },
+    "yellowguy": {
+      "status": "placeholder",
+      "reference": "Avatar clásico amarillo con bastón",
+      "legacy_mesh": null
+    },
+    "junkbot": {
+      "status": "catalog_or_placeholder",
+      "bundle_id": 589,
+      "url": "https://www.roblox.com/es/bundles/589/Junkbot",
+      "legacy_robot_mesh": "dist/reference-characters/yellowguy/yellowguy.fbx",
+      "legacy_mesh_is_original": false
+    },
+    "deathspeaker": {
+      "status": "placeholder",
+      "reference": "Korblox Deathspeaker clásico",
+      "legacy_mesh": "dist/reference-characters/deathspeaker/deathspeaker.fbx"
+    },
+    "guest666": {
+      "status": "placeholder",
+      "reference": "Avatar oscuro con ojos rojos",
+      "legacy_mesh": "dist/reference-characters/guest666/guest666.fbx"
+    },
+    "tubers93": {
+      "status": "placeholder",
+      "reference": "Avatar oscuro con guadaña",
+      "legacy_mesh": "dist/reference-characters/tubers93/tubers93.fbx"
+    }
+  },
+  "future": [
+    "baller"
+  ],
+  "studio_verified": false,
+  "note": "Los FBX históricos son aproximaciones y no están publicados como assets de Roblox."
+}

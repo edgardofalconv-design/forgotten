@@ -1,0 +1,25 @@
+FORGOTTEN V2 — ABRIR Y JUGAR
+
+1. Extrae este ZIP en una carpeta de tu computador.
+2. Abre Roblox Studio > Archivo > Abrir desde archivo > Forgotten-V2.rbxlx.
+3. Pulsa Play/F5. En PERSONAJES elige un superviviente; en MAPAS vota un escenario.
+4. Vuelve a JUGAR y pulsa PROBAR SOLO.
+5. Repara dos generadores: cables en orden, interruptores indicados y tres tirones en verde.
+6. Resuelve tres puzles, recoge sus cápsulas con E y llévalas al depósito junto a la salida.
+7. Con los requisitos completos y 1:00 o menos, cruza físicamente la salida.
+
+WASD: moverse. Espacio: saltar. Shift: correr. E: interactuar.
+Q/R/F/G/T/Y: habilidades. Z/X: objetos. Clic: ataque del asesino.
+M: menú. Tab: marcador. El HUD también tiene botones.
+
+Multijugador: Test/Prueba > Server & Clients > 3 clientes para normal de 4:00.
+Con 2 clientes se activa LMS: 1:30, puerta a 0:00 y escape físico.
+El campamento es solo el lobby. La práctica no da monedas ni maestría.
+La tienda usa 100 monedas iniciales experimentales.
+Si dice Progreso de sesión, las compras no se guardarán al cerrar.
+
+No necesitas PowerShell, Rojo ni pegar código.
+Comprobado localmente con pruebas simuladas; falta probarlo realmente en Studio.
+Hay modelos/skins provisionales. Faltan audios, retratos y animaciones finales.
+Lee docs/V2_PRUEBAS_Y_PENDIENTES.md y CHANGELOG-V2.md.
+La carpeta proyecto contiene las fuentes para seguir editando.

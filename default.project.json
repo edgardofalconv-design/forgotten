@@ -1,0 +1,38 @@
+{
+  "name": "Forgotten",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Shared": {
+        "$path": "src/shared"
+      }
+    },
+    "ServerScriptService": {
+      "Game": {
+        "$path": "src/server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "UI": {
+          "$path": "src/client"
+        }
+      }
+    },
+    "ServerStorage": {
+      "$className": "ServerStorage",
+      "CharacterModels": {
+        "$className": "Folder",
+        "$ignoreUnknownInstances": true
+      },
+      "CatalogCharacters": {
+        "$className": "Folder",
+        "$ignoreUnknownInstances": true
+      },
+      "ReferenceCharacters": {
+        "$className": "Folder",
+        "$ignoreUnknownInstances": true
+      }
+    }
+  }
+}
