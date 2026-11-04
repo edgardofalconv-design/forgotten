@@ -1,71 +1,100 @@
--- Procedural defaults remain functional with no external AnimationIds.
+-- V3 character-specific animation state machine. Every observer samples server time.
 local Config=require(script.Parent.AnimationConfig)
+local Motion=require(script.Parent.CharacterMotion)
 return function()
  local Collection=game:GetService("CollectionService")
  local RunService=game:GetService("RunService")
  local rigs={}
  local function add(model)
-  local joints={}
-  for _,obj in ipairs(model:GetDescendants()) do
-   if obj:IsA("Motor6D") then
-    local name=obj.Name:gsub(" ","")
-    if name=="LeftShoulder" or name=="RightShoulder" or name=="LeftHip" or name=="RightHip" or name=="Neck" or name=="Waist" or name=="RootJoint" then joints[name]=obj end
+  local joints,visuals={},{}
+  for _,object in ipairs(model:GetDescendants()) do
+   if object:IsA("Motor6D") then joints[Motion.jointKey(object.Name)]=object
+   elseif object:IsA("BasePart") then
+    local group=object.Parent
+    local weapon=object:GetAttribute("WeaponKind") or group and group:GetAttribute("WeaponKind")
+    local action=object:GetAttribute("VisibilityAction")
+    if weapon or action then table.insert(visuals,{part=object,weapon=weapon,action=action}) end
    end
   end
-  rigs[model]={joints=joints,phase=0,tracks={}}
+  local data={joints=joints,visuals=visuals,phase=0,tracks={},state="idle",stateAt=0,wasAir=false}
+  data.connection=model.DescendantAdded:Connect(function(object)
+   if object:IsA("Motor6D") then joints[Motion.jointKey(object.Name)]=object
+   elseif object:IsA("BasePart") then
+    local weapon=object:GetAttribute("WeaponKind") or object.Parent and object.Parent:GetAttribute("WeaponKind")
+    local action=object:GetAttribute("VisibilityAction")
+    if weapon or action then table.insert(visuals,{part=object,weapon=weapon,action=action}) end
+   end
+  end)
+  rigs[model]=data
  end
- local function track(data,h,key)
-  local id=Config[key]
-  if type(id)~="string" or not id:match("^rbxassetid://%d+$") then return nil end
-  if data.tracks[key]==nil then
+ local function external(data,h,id,key)
+  local overrides=Config.characters and Config.characters[id]
+  local asset=overrides and overrides[key] or Config[key]
+  if type(asset)~="string" or not asset:match("^rbxassetid://%d+$") then return nil end
+  if data.tracks[asset]==nil then
    local animator=h:FindFirstChildOfClass("Animator")
    if not animator then return nil end
-   local animation=Instance.new("Animation");animation.AnimationId=id
-   local ok,result=pcall(function()return animator:LoadAnimation(animation)end)
-   animation:Destroy();data.tracks[key]=ok and result or false
+   local clip=Instance.new("Animation");clip.AnimationId=asset
+   local ok,result=pcall(function()return animator:LoadAnimation(clip)end)
+   clip:Destroy();data.tracks[asset]=ok and result or false
   end
-  return data.tracks[key] or nil
+  return data.tracks[asset] or nil
  end
  Collection:GetInstanceAddedSignal("ForgottenAnimated"):Connect(add)
- Collection:GetInstanceRemovedSignal("ForgottenAnimated"):Connect(function(model)rigs[model]=nil end)
+ Collection:GetInstanceRemovedSignal("ForgottenAnimated"):Connect(function(model)
+  if rigs[model] and rigs[model].connection then rigs[model].connection:Disconnect() end
+  rigs[model]=nil
+ end)
  for _,model in ipairs(Collection:GetTagged("ForgottenAnimated")) do add(model) end
  RunService.PreSimulation:Connect(function(dt)
+  local now=workspace:GetServerTimeNow()
   for model,data in pairs(rigs) do
    local root=model:FindFirstChild("HumanoidRootPart");local h=model:FindFirstChildOfClass("Humanoid")
-   if model:IsDescendantOf(workspace) and root and h and h.Health>0 then
+   local camera=workspace.CurrentCamera
+   local nearby=root and (not root.Anchored or not camera or (camera.CFrame.Position-root.Position).Magnitude<180)
+   if model:IsDescendantOf(workspace) and root and h and nearby then
     local velocity=root.AssemblyLinearVelocity
     local speed=Vector3.new(velocity.X,0,velocity.Z).Magnitude
-    data.phase=data.phase+dt*(speed>1 and math.min(15,5+speed*.3) or 2)
-    local airborne=h.FloorMaterial==Enum.Material.Air and math.abs(velocity.Y)>2
-    local now=workspace:GetServerTimeNow()
-    local actionAt=model:GetAttribute("ActionAt") or -100
-    local damageAt=model:GetAttribute("DamageAt") or -100
+    data.phase=data.phase+dt*(speed>1 and math.min(16,5+speed*.32) or 2)
+    local id=model:GetAttribute("CharacterIdentity") or "pelotocino"
+    local air=h.FloorMaterial==Enum.Material.Air and not root.Anchored
+    if data.wasAir and not air then data.landedAt=now end
+    data.wasAir=air
     local action=model:GetAttribute("Action") or ""
-    local key=now-damageAt<.25 and "hit" or now-actionAt<.6 and "skill" or airborne and "jump" or speed>20 and "run" or speed>1 and "walk" or "idle"
-    local external=track(data,h,key)
-    if external then
-     if data.current~=external then
-      if data.current then data.current:Stop(.15) end
-      external.Looped=key=="idle" or key=="walk" or key=="run";external:Play(.15);data.current=external
+    local actionTime=now-(model:GetAttribute("ActionAt") or -100)
+    local use=(model:GetAttribute("ItemActionUntil") or 0)>now and model:GetAttribute("ItemAction")
+    local state=h.Health<=0 and "death"
+     or (model:GetAttribute("StunnedUntil") or 0)>now and "stun"
+     or now-(model:GetAttribute("DamageAt") or -100)<.22 and "hit"
+     or use or (model:GetAttribute("RepairStage") or 0)>0 and "repairGenerator" or air and (velocity.Y>1 and "jump" or "fall")
+     or now-(data.landedAt or -100)<.28 and "land"
+     or speed>23 and "sprint" or speed>18 and "run" or speed>.7 and "walk" or "idle"
+    if state~=data.state then data.state=state;data.stateAt=now end
+    local key=Motion.durations[action] and actionTime<Motion.durations[action] and actionTime>=0 and action or state
+    local track=external(data,h,id,key) or (key~=state and external(data,h,id,"skill"))
+    if track then
+     if data.current~=track then
+      if data.current then data.current:Stop(.12) end
+      track.Looped=key=="idle" or key=="walk" or key=="run" or key=="sprint"
+      track:Play(.12);data.current=track
      end
     else
-     if data.current then data.current:Stop(.15);data.current=nil end
-     local swing=math.sin(data.phase)*(speed>20 and .82 or speed>1 and .6 or .035)
+     if data.current then data.current:Stop(.12);data.current=nil end
+     local pose=Motion.sample(id,state,data.phase,speed,action,actionTime,{stateTime=now-data.stateAt,repairStage=model:GetAttribute("RepairStage"),pullElapsed=now-(model:GetAttribute("RepairPullAt") or -100)})
+     local alpha=1-math.exp(-dt*19)
      for name,joint in pairs(data.joints) do
-      local angle=(name:find("Left") and 1 or -1)*swing
-      local yaw=0
-      if name:find("Shoulder") then
-       angle=airborne and -.8 or -angle
-       if now-actionAt<.6 then
-        if action=="shield" or action=="caneGuard" then angle=-1.2
-        elseif name=="RightShoulder" then angle=-1.5+math.sin((now-actionAt)*8)*.8 end
-       end
-      elseif name=="Neck" then angle=now-damageAt<.25 and -.28 or math.sin(data.phase*.5)*.025
-      elseif name=="RootJoint" or name=="Waist" then
-       angle=0
-       if action=="spin" and now-actionAt<.6 then yaw=(now-actionAt)/.6*math.pi*2 end
+      local values=pose[name]
+      if values then
+       local target=Motion.toTransform(joint,values)
+       joint.Transform=joint.Transform:Lerp(target,alpha)
       end
-      joint.Transform=CFrame.Angles(angle,yaw,0)
+     end
+    end
+    local away=(model:GetAttribute("CaneAwayUntil") or 0)>now
+    for _,visual in ipairs(data.visuals) do
+     if visual.part.Parent then
+      if visual.action then visual.part.Transparency=action==visual.action and actionTime>=0 and actionTime<1 and 0 or 1 end
+      if visual.weapon=="cane" then visual.part.LocalTransparencyModifier=(away or visual.part:GetAttribute("MeshReplaced")) and 1 or 0 end
      end
     end
    end

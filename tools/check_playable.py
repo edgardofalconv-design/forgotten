@@ -109,7 +109,7 @@ assert(energy.value==100 and not energy.exhausted)
 FACTORY_MOCK = r'''
 local baseIndex=omt.__index
 omt.__index=function(self,key)
- if key=="IsA" then return function(o,class) return o.ClassName==class or class=="BasePart" and (o.ClassName=="Part" or o.ClassName=="MeshPart") end end
+ if key=="IsA" then return function(o,class) return o.ClassName==class or class=="BasePart" and (o.ClassName=="Part" or o.ClassName=="MeshPart" or o.ClassName=="WedgePart") end end
  if key=="SetAttribute" then return function(o,k,v) o.props.attributes=o.props.attributes or {};o.props.attributes[k]=v end end
  if key=="GetAttribute" then return function(o,k) return o.props.attributes and o.props.attributes[k] end end
  if key=="GetDescendants" then return function(o)
@@ -134,6 +134,7 @@ warn=function()end
 '''
 FACTORY_TESTS = r'''
 for _,entry in ipairs(roster) do
+ nodes={}
  local m=Factory.create(entry)
  local valid,reason=Factory.validate(m,entry.id)
  assert(valid,entry.id..": "..tostring(reason))
@@ -144,7 +145,7 @@ for _,entry in ipairs(roster) do
  local parts,marks,cane,pack,robot=0,0,false,false,false
  for _,obj in ipairs(m:GetDescendants()) do
   if obj:IsA("BasePart") then assert(not obj.Anchored) end
-  if obj.Name and obj.Name:find("CombatMark_") then marks=marks+1 end
+  if obj:IsA("BasePart") and obj.Name and obj.Name:find("CombatMark_") then marks=marks+1 end
   if obj.Name=="Baston" then cane=true end
   if obj.Name=="Mochila" then pack=true end
   if obj.Name=="Cresta dorsal" then robot=true end
@@ -175,7 +176,7 @@ def syntax_check():
         run_lua(source, 'sintaxis adaptada: '+str(path.relative_to(ROOT)), execute=False)
 
 
-def check_export(target='Forgotten-V2.rbxlx'):
+def check_export(target='Forgotten-V3.rbxlx'):
     tree=ET.parse(ROOT/'dist'/target)
     scripts={n.find("Properties/string[@name='Name']").text:n for n in tree.findall('.//Item') if n.attrib['class'] in ['Script','LocalScript','ModuleScript']}
     assert 'Game' in scripts and 'UI' in scripts

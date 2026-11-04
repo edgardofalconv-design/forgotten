@@ -11,6 +11,8 @@ local ItemConfig=require(shared.ItemConfig)
 local Portraits=require(shared.Portraits)
 local roster=require(shared.Roster);local byId={};for _,entry in ipairs(roster) do byId[entry.id]=entry end
 require(shared.BasicAnimation)()
+require(shared.EditableAppearance).start()
+require(shared.GeneratorVisuals).animate()
 pcall(function()game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false)end)
 local function follow(character)
  local h=character:WaitForChild("Humanoid",10)
@@ -37,6 +39,11 @@ local updateMusic=require(shared.ClientMusic)(musicLabel)
 local toast=T.frame(gui,"Notificacion",UDim2.fromScale(.31,.22),UDim2.fromScale(.66,.12),T.bg);toast.Visible=false;toast.ZIndex=50
 local toastText=T.label(toast,"Texto","",UDim2.fromScale(.03,.08),UDim2.fromScale(.94,.84),15)
 local toastUntil=0
+local escapeData,escapeUntil
+local escapeButton=T.button(gui,"EscaparDelAtaque","",UDim2.fromScale(.32,.59),UDim2.fromScale(.36,.08),function()
+ if escapeData then remote:FireServer("struggle",escapeData.token) end
+end,T.red)
+escapeButton.Visible=false
 local function notify(message,duration)toastText.Text=message;toast.Visible=true;toastUntil=os.clock()+(duration or 5)end
 T.button(gui,"Menu","MENÚ · M",UDim2.fromScale(.02,.11),UDim2.fromScale(.16,.06),function()menus.open()end)
 local function showScoreboard()
@@ -97,7 +104,7 @@ local function refreshHUD()
  attackButton.Visible=entry and entry.role=="Asesino" or false
  sprintButton.Text=sprinting and "PARAR" or "SHIFT · CORRER"
  statusLabel.Text=table.concat(combat.statuses or {},"  •  ")
- if not active then challenge.close();if sprinting then sprint(false) end end
+ if not active then challenge.close();escapeData=nil;escapeButton.Visible=false;if sprinting then sprint(false) end end
 end
 local function refreshState()
  local remaining=math.max(0,math.ceil(state.remaining or 0))
@@ -119,6 +126,7 @@ end
 player:GetAttributeChangedSignal("InRound"):Connect(refreshHUD)
 local keySlots={Q=1,R=2,F=3,G=4,T=5,Y=6}
 UIS.InputBegan:Connect(function(input,processed)
+ if escapeData and input.KeyCode==Enum.KeyCode.E and not UIS:GetFocusedTextBox() then remote:FireServer("struggle",escapeData.token);return end
  if processed then return end
  local key=input.KeyCode.Name
  if key=="M" then menus.open();return end
@@ -152,6 +160,9 @@ remote.OnClientEvent:Connect(function(kind,data)
  elseif kind=="effect" then effects.effect(data)
  elseif kind=="sfx" then effects.sound(data)
  elseif kind=="reveal" then effects.reveal(data)
+ elseif kind=="escape" then
+  escapeData=data;escapeUntil=os.clock()+data.duration;escapeButton.Text="¡ESCAPA!  E · "..data.taps.." / "..data.required;escapeButton.Visible=true
+ elseif kind=="escapeClose" then escapeData=nil;escapeButton.Visible=false
  elseif kind=="results" then scoreboardOpen=false;results.show(data,false);challenge.close();effects.sound("results") end
 end)
 local elapsed=0;local audioElapsed=0;local footstepAt=0
@@ -160,6 +171,7 @@ RunService.Heartbeat:Connect(function(dt)
  if elapsed>=.1 then
   elapsed=0
   if toast.Visible and os.clock()>toastUntil then toast.Visible=false end
+  if escapeData and os.clock()>escapeUntil then escapeData=nil;escapeButton.Visible=false end
   local c=player.Character;local h=c and c:FindFirstChildOfClass("Humanoid");local root=c and c:FindFirstChild("HumanoidRootPart")
   local hp=h and math.max(0,h.Health) or 0;local max=h and h.MaxHealth or 100;local stamina=player:GetAttribute("Energy") or 100
   health.Text="VIDA  "..math.ceil(hp).." / "..max;healthFill.Size=UDim2.fromScale(hp/math.max(1,max),1);healthFill.BackgroundColor3=hp<30 and T.red or T.green

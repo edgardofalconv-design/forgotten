@@ -1,0 +1,28 @@
+FORGOTTEN V3 — ABRIR Y JUGAR
+
+1. Extrae este ZIP en una carpeta de tu computador.
+2. Roblox Studio > Archivo > Abrir desde archivo > Forgotten-V3.rbxlx.
+3. Pulsa Play/F5. PERSONAJES > elige un superviviente.
+4. JUGAR > PROBAR SOLO. Revisa los modelos al jugar, no en la maqueta de edición.
+5. Repara dos generadores (cables, interruptores, tres tirones en verde).
+6. Resuelve tres puzles, recoge cápsulas con E y deposítalas junto a la salida.
+7. Con los requisitos y 1:00 o menos, atraviesa físicamente la puerta.
+
+WASD: movimiento. Espacio: salto. Shift: correr. E: interactuar/liberarse.
+Q/R/F/G/T/Y: habilidades. Z/X: objetos. Clic: ataque del asesino.
+M: menú. Tab: marcador. Yellow Guy lanza el bastón con G y lo recupera solo.
+
+Multijugador: Test/Prueba > Server & Clients > 3 clientes para una ronda normal.
+Con 2 clientes: LMS de 1:30, puerta a 0:00 y escape físico.
+El campamento es SOLO el lobby. La práctica no da monedas ni maestría.
+Si dice Progreso de sesión, las compras no se guardan al cerrar.
+
+No necesitas PowerShell, Rojo ni pegar código.
+V1 y V2 conservan sus entregas; este archivo es V3.
+Pruebas locales y renders de Blender: NO se ha ejecutado Roblox Studio aquí.
+Los modelos propios son provisionales. Se intenta cargar el Junkbot y
+Deathspeaker originales, y Pal Hair oficial, al jugar con acceso a Roblox.
+
+Vistas: docs/V3_VISTAS.md y dist/v3/previews/ (siete PNG).
+Pendientes: docs/V3_PRUEBAS_Y_PENDIENTES.md. Cambios: CHANGELOG-V3.md.
+src/, tools/, assets/ y default.project.json contienen el proyecto editable.

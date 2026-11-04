@@ -13,7 +13,8 @@ return {
  yellowguy={
   a("cane","Golpe de bastón","╱","stun",18,12,6,3,10),
   a("caneGuard","Guardia del bastón","◇","shield",24,0,.5,4,15),
-  a("lastFighter","Last Fighter","★","lastFighter",40,0,15,5,20)},
+  a("lastFighter","Last Fighter","★","lastFighter",40,0,15,5,20),
+  a("caneThrow","Lanzar bastón","↗","caneThrow",18,28,6,3,10)},
  junkbot={
   a("overdrive","Overdrive Rush","»","speed",18,0,28,4,15),
   a("rocketSlam","Rocket Slam","↓","slam",24,12,12,2,20),

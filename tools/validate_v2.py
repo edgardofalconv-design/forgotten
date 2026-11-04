@@ -21,6 +21,8 @@ def protect():
     return checked
 
 def main():
+    if (ROOT/'src/shared/CharacterMotion.luau').exists():
+        raise SystemExit('La V2 está protegida. Este proyecto ya es V3; utiliza tools/validate_v3.py.')
     protected=protect()
     tasks=[('resources',[sys.executable,'tools/check_resources.py']),
            ('v2_behavior',[sys.executable,'tools/check_v2.py']),

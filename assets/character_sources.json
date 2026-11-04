@@ -1,41 +1,62 @@
 {
   "active": {
     "pelotocino": {
-      "status": "placeholder",
+      "status": "native_r6_with_authored_v3",
       "reference": "Bacon con mochila",
-      "legacy_mesh": "dist/reference-characters/pelotocino/pelotocino.fbx"
+      "legacy_mesh": "dist/reference-characters/pelotocino/pelotocino.fbx",
+      "authored_geometry": "assets/v3/character-geometry.json",
+      "runtime_catalog_hair": {
+        "name": "Pal Hair",
+        "creator": "Roblox",
+        "resolved_id": null
+      }
     },
     "yellowguy": {
-      "status": "placeholder",
+      "status": "native_r6_with_authored_v3",
       "reference": "Avatar clásico amarillo con bastón",
-      "legacy_mesh": null
+      "legacy_mesh": null,
+      "authored_geometry": "assets/v3/character-geometry.json"
     },
     "junkbot": {
-      "status": "catalog_or_placeholder",
+      "status": "official_catalog_or_authored_v3",
       "bundle_id": 589,
       "url": "https://www.roblox.com/es/bundles/589/Junkbot",
       "legacy_robot_mesh": "dist/reference-characters/yellowguy/yellowguy.fbx",
-      "legacy_mesh_is_original": false
+      "legacy_mesh_is_original": false,
+      "authored_geometry": "assets/v3/character-geometry.json"
     },
     "deathspeaker": {
-      "status": "placeholder",
+      "status": "official_catalog_or_authored_v3",
       "reference": "Korblox Deathspeaker clásico",
-      "legacy_mesh": "dist/reference-characters/deathspeaker/deathspeaker.fbx"
+      "legacy_mesh": "dist/reference-characters/deathspeaker/deathspeaker.fbx",
+      "authored_geometry": "assets/v3/character-geometry.json",
+      "runtime_catalog_body": {
+        "name": "Korblox Deathspeaker",
+        "creator": "Roblox",
+        "resolved_id": null
+      }
     },
     "guest666": {
-      "status": "placeholder",
+      "status": "native_r6_with_authored_v3",
       "reference": "Avatar oscuro con ojos rojos",
-      "legacy_mesh": "dist/reference-characters/guest666/guest666.fbx"
+      "legacy_mesh": "dist/reference-characters/guest666/guest666.fbx",
+      "authored_geometry": "assets/v3/character-geometry.json"
     },
     "tubers93": {
-      "status": "placeholder",
+      "status": "native_r6_with_authored_v3",
       "reference": "Avatar oscuro con guadaña",
-      "legacy_mesh": "dist/reference-characters/tubers93/tubers93.fbx"
+      "legacy_mesh": "dist/reference-characters/tubers93/tubers93.fbx",
+      "authored_geometry": "assets/v3/character-geometry.json",
+      "runtime_catalog_hair": {
+        "name": "Pal Hair",
+        "creator": "Roblox",
+        "resolved_id": null
+      }
     }
   },
   "future": [
     "baller"
   ],
   "studio_verified": false,
-  "note": "Los FBX históricos son aproximaciones y no están publicados como assets de Roblox."
+  "note": "V3 usa geometría propia y búsqueda oficial en tiempo de ejecución. Catálogo real y Studio sin verificar aquí. Los FBX históricos siguen siendo aproximaciones; el antiguo yellowguy es un robot y nunca se equipa a Yellow Guy."
 }

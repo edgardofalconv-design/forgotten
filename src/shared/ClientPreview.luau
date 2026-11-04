@@ -4,6 +4,7 @@ local Portraits=require(script.Parent.Portraits)
 local Cosmetics=require(script.Parent.Cosmetics)
 local T=require(script.Parent.ClientTheme)
 local AnimationConfig=require(script.Parent.AnimationConfig)
+local Motion=require(script.Parent.CharacterMotion)
 local Preview={}
 local function image(id)return type(Portraits[id])=="string" and Portraits[id]:match("^rbxassetid://%d+$") and Portraits[id] or nil end
 function Preview.icon(parent,id,pos,size)
@@ -25,6 +26,7 @@ function Preview.show(parent,id,equipment,pose)
  if not source then caption.Text="VISTA PENDIENTE";return end
  local world=Instance.new("WorldModel");world.Parent=viewport
  local model=source:Clone();model.Parent=world
+ task.defer(function()if model.Parent then require(script.Parent.EditableAppearance).apply(model) end end)
  Cosmetics.apply(model,id,equipment)
  local root=model:FindFirstChild("HumanoidRootPart");if root then root.Anchored=true end
  local center,size=model:GetBoundingBox()
@@ -34,7 +36,7 @@ function Preview.show(parent,id,equipment,pose)
  camera.CFrame=CFrame.lookAt(focus+Vector3.new(distance*.25,distance*.08,-distance),focus)
  caption.Text=(model:GetAttribute("Placeholder") and "MODELO PROVISIONAL" or "VISTA 3D · RETRATO PENDIENTE")..((model:GetAttribute("Milestone") or 0)>0 and " · SKIN PROVISIONAL" or "")
  local joints={}
- for _,node in ipairs(model:GetDescendants()) do if node:IsA("Motor6D") then joints[node.Name:gsub(" ","")]=node end end
+ for _,node in ipairs(model:GetDescendants()) do if node:IsA("Motor6D") then joints[Motion.jointKey(node.Name)]=node end end
  local external
  local animKey=pose=="mvp" and "mvp" or pose=="victory" and (id=="guest666" and "guestVictory" or id=="tubers93" and "tubersVictory" or "results")
  local animationId=animKey and AnimationConfig[animKey]
@@ -55,14 +57,10 @@ function Preview.show(parent,id,equipment,pose)
   distance=math.max(size.Y*1.6,size.X/math.max(.3,aspect)*1.6,8)
   camera.CFrame=CFrame.lookAt(focus+Vector3.new(math.sin(elapsed*.18)*distance*.18,distance*.08,-distance),focus)
   if not external or not external.IsPlaying then
+  local transforms=pose and Motion.presentation(id,pose,elapsed) or Motion.sample(id,"idle",elapsed*2,0,"",100)
   for name,joint in pairs(joints) do
-   local angle=0
-   if name:find("Shoulder") then
-    angle=math.sin(elapsed*2)*.035
-    if pose=="victory" then angle=id=="tubers93" and (name=="RightShoulder" and -1.6 or -.25) or id=="guest666" and -.8+math.sin(elapsed*2.5)*.18 or -.65 end
-    if pose=="mvp" then angle=name=="RightShoulder" and -2.2 or -.2 end
-   elseif name=="Neck" then angle=pose=="victory" and .16 or math.sin(elapsed)*.025 end
-   joint.Transform=CFrame.Angles(angle,0,0)
+   local v=transforms[name]
+   if v then joint.Transform=Motion.toTransform(joint,v) end
   end
   end
  end)

@@ -3,6 +3,8 @@ local Collection=game:GetService("CollectionService")
 local Appearance=require(script.Parent.Appearance)
 local Imported=require(script.Parent.ImportedAppearance)
 local Catalog=require(script.Parent.CatalogCharacter)
+local AvatarCatalog=require(script.Parent.AvatarCatalog)
+local Visuals=require(script.Parent.CharacterVisuals)
 local Factory={}
 
 function Factory.validate(model,id)
@@ -53,13 +55,13 @@ local function placeholder(entry)
  local root=part("HumanoidRootPart",Vector3.new(2,2,1),Vector3.new())
  root.Transparency=1;root.CanCollide=false
  local torso=part("Torso",Vector3.new(2,2,1),Vector3.new())
- local head=part("Head",Vector3.new(1.2,1.2,1.2),Vector3.new(0,1.6,0))
+ local head=part("Head",Vector3.new(2,1,1),Vector3.new(0,1.5,0))
  local function joint(name,p0,p1,c0,c1)
   local motor=Instance.new("Motor6D");motor.Name=name;motor.Part0=p0;motor.Part1=p1
   motor.C0=c0;motor.C1=c1;motor.Parent=p0
  end
  joint("RootJoint",root,torso,CFrame.new(),CFrame.new())
- joint("Neck",torso,head,CFrame.new(0,1,0),CFrame.new(0,-.6,0))
+ joint("Neck",torso,head,CFrame.new(0,1,0),CFrame.new(0,-.5,0))
  for _,side in ipairs({-1,1}) do
   local prefix=side<0 and "Left" or "Right"
   local arm=part(prefix.." Arm",Vector3.new(1,2,1),Vector3.new(side*1.5,0,0))
@@ -74,7 +76,7 @@ local function placeholder(entry)
  model:SetAttribute("Placeholder",true)
  model:SetAttribute("ModelStatus","Provisional")
  if Imported.apply(model,entry.id,false) then model:SetAttribute("ModelStatus","Malla importada · pendiente de validar")
- else Appearance.apply(model,entry.id,false) end
+ else Visuals.apply(model,entry.id);model:SetAttribute("ModelStatus","Modelo propio V3 · provisional") end
  return model
 end
 
@@ -111,6 +113,21 @@ function Factory.create(entry)
    else model:SetAttribute("Placeholder",false);model:SetAttribute("ModelStatus","Modelo original de Roblox") end
   end
  end
+ if not model and entry.id~="junkbot" then
+  local native=AvatarCatalog.clone(entry.id)
+  if native then
+   local valid=Factory.validate(native,entry.id)
+   if valid then
+    model=native
+    if model:GetAttribute("OfficialCatalogBody") then
+     model:SetAttribute("Placeholder",false);model:SetAttribute("ModelStatus","Cuerpo original de Roblox · catálogo verificado")
+    else
+     Visuals.apply(model,entry.id)
+     model:SetAttribute("Placeholder",true);model:SetAttribute("ModelStatus",model:GetAttribute("OfficialBaconHair") and "Rig y cabello Roblox · vestuario propio V3" or "Rig Roblox · apariencia propia V3")
+    end
+   else native:Destroy() end
+  end
+ end
  if not model then model=placeholder(entry) end
  if entry.id=="junkbot" and not model:GetAttribute("Placeholder") then wear(model) end
  -- Known local character scripts are provided by this project, not the source rig.
@@ -126,6 +143,7 @@ function Factory.create(entry)
  if not h:FindFirstChildOfClass("Animator") then local animator=Instance.new("Animator");animator.Parent=h end
  h.Health=100;h.MaxHealth=100;h.WalkSpeed=entry.role=="Asesino" and 18 or 16
  h.DisplayName=entry.name..(model:GetAttribute("Placeholder") and " [provisional]" or "")
+ h.BreakJointsOnDeath=false
  Collection:AddTag(model,"ForgottenAnimated")
  return model
 end

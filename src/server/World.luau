@@ -6,6 +6,7 @@ local World={}
 function World.part(parent,name,size,position,color,material)
  local p=Instance.new("Part");p.Name=name;p.Size=size;p.Position=position
  p.Color=color;p.Material=material or Enum.Material.Metal;p.Anchored=true
+ if World.variants and World.variants[p.Material] then p.MaterialVariant=World.variants[p.Material] end
  p.TopSurface=Enum.SurfaceType.Smooth;p.BottomSurface=Enum.SurfaceType.Smooth;p.Parent=parent
  return p
 end
@@ -23,8 +24,8 @@ function World.build(roster,remote)
  local world=Instance.new("Folder");world.Name="Forgotten";world.Parent=workspace
  Lighting.ClockTime=0.5;Lighting.Brightness=2.1
  Lighting.Ambient=Color3.fromRGB(38,43,53);Lighting.OutdoorAmbient=Color3.fromRGB(57,72,97)
- Lighting.GlobalShadows=true;Lighting.ShadowSoftness=.3;Lighting.ExposureCompensation=.08
- Lighting.EnvironmentDiffuseScale=.45;Lighting.EnvironmentSpecularScale=.7
+ Lighting.GlobalShadows=true;Lighting.ShadowSoftness=.35;Lighting.ExposureCompensation=.18
+ Lighting.EnvironmentDiffuseScale=.58;Lighting.EnvironmentSpecularScale=.65
  Lighting.FogColor=Color3.fromRGB(27,35,46);Lighting.FogEnd=420
  local grade=Lighting:FindFirstChild("ForgottenGrade") or Instance.new("ColorCorrectionEffect")
  grade.Name="ForgottenGrade";grade.Contrast=.12;grade.Saturation=-.12;grade.TintColor=Color3.fromRGB(255,241,222);grade.Parent=Lighting
@@ -33,6 +34,7 @@ function World.build(roster,remote)
  local atmosphere=Lighting:FindFirstChild("ForgottenAtmosphere") or Instance.new("Atmosphere")
  atmosphere.Name="ForgottenAtmosphere";atmosphere.Density=.24;atmosphere.Offset=.15;atmosphere.Haze=1.2;atmosphere.Color=Color3.fromRGB(168,181,194);atmosphere.Parent=Lighting
  local variants=require(RS.Shared.MaterialPack)()
+ World.variants=variants
  local lobby=require(RS.Shared.Lobby)(world,roster,remote,variants,false)
  local camp=Instance.new("Model");camp.Name="CampamentoSoloLobby";camp.Parent=world
  local wood=Color3.fromRGB(81,55,40)
@@ -50,9 +52,24 @@ function World.build(roster,remote)
  for i=1,32 do
   local a=i/32*math.pi*2
   local pos=Vector3.new(math.cos(a)*84,0,math.sin(a)*84)
-  World.part(camp,"Tronco del campamento",Vector3.new(2.5,16,2.5),pos+Vector3.new(0,7,0),wood,Enum.Material.Wood)
-  local leaves=World.part(camp,"Pino del campamento",Vector3.new(11,14,11),pos+Vector3.new(0,18,0),Color3.fromRGB(23,53,39),Enum.Material.Grass)
-  leaves.Shape=Enum.PartType.Ball;leaves.CanCollide=false
+  local height=14+(i%4)*1.2
+  local trunk=World.part(camp,"Tronco del campamento",Vector3.new(height,2.1,2.1),pos+Vector3.new(0,height/2,0),wood,Enum.Material.Wood)
+  trunk.Shape=Enum.PartType.Cylinder;trunk.CFrame=trunk.CFrame*CFrame.Angles(0,0,math.pi/2)
+  for tier=1,3 do
+   local width=13-tier*2
+   local leaves=World.part(camp,"Copa escalonada",Vector3.new(width,7,width),pos+Vector3.new(0,height-3+tier*3.4,0),Color3.fromRGB(22+i%3*3,46+i%5*3,34+i%4*2),Enum.Material.Grass)
+   leaves.Shape=Enum.PartType.Ball;leaves.CanCollide=false;leaves.CanTouch=false;leaves.CanQuery=false;leaves.CastShadow=tier==1
+  end
+  if i%2==0 then
+   local rock=World.part(camp,"Piedra musgosa",Vector3.new(3.2,1.3,2.1),pos*.88+Vector3.new(0,.2,0),Color3.fromRGB(67,75,65),Enum.Material.Slate)
+   rock.Shape=Enum.PartType.Ball;rock.CanCollide=false;rock.CanQuery=false;rock.CanTouch=false
+   for leaf=1,5 do
+    local angle=leaf*math.pi*2/5
+    local fern=World.part(camp,"Helecho de sotobosque",Vector3.new(.24,2.1,.7),pos*.92+Vector3.new(math.cos(angle)*.4,.7,math.sin(angle)*.4),Color3.fromRGB(39,67,44),Enum.Material.Grass)
+    fern.Shape=Enum.PartType.Ball;fern.CFrame=fern.CFrame*CFrame.Angles(.5,angle,.25)
+    fern.CanCollide=false;fern.CanTouch=false;fern.CanQuery=false;fern.CastShadow=false
+   end
+  end
  end
  local sign=World.part(camp,"Zona segura",Vector3.new(18,4,.4),Vector3.new(0,6,-46),wood,Enum.Material.WoodPlanks)
  sign.CanCollide=false;sign.CanQuery=false
@@ -76,6 +93,13 @@ function World.build(roster,remote)
  for i=1,#roster do installNPC(i) end
 
  require(script.Parent.Camp).extend(world,remote,World)
+ -- Keep warm pools of light, but bound the expensive shadow casters.
+ local shadowLights=0
+ for _,object in ipairs(world:GetDescendants()) do
+  if object:IsA("PointLight") and object.Shadows then
+   shadowLights=shadowLights+1;object.Shadows=shadowLights<=5
+  end
+ end
  local data={root=world,lobby=lobby,lobbyPosition=Vector3.new(0,.7,-25),spawn=lobby:FindFirstChild("Refugio"),refreshNPC=installNPC}
  local Maps=require(script.Parent.Maps)
  local mapCatalog=require(RS.Shared.MapCatalog)

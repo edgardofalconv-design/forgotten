@@ -1,8 +1,34 @@
 local RS=game:GetService("ReplicatedStorage")
 local Config=require(RS.Shared.AbilityConfig)
 local Factory=require(RS.Shared.CharacterFactory)
+local Timing=require(RS.Shared.AbilityTiming)
 local Abilities={};Abilities.__index=Abilities
-function Abilities.new(context)return setmetatable({c=context,zones={},pending={}},Abilities)end
+function Abilities.new(context)return setmetatable({c=context,zones={},pending={},scheduled={}},Abilities)end
+function Abilities:later(player,delay,callback)
+ table.insert(self.scheduled,{player=player,record=self.c.records()[player],at=os.clock()+delay,callback=callback})
+end
+function Abilities:hold(attacker,target,kind,duration,escape)
+ if not self.c.playing(target) then return end
+ local r=self.c.records()[target];local now=os.clock()
+ r.holdUntil=now+duration
+ target.Character:SetAttribute("Action",kind);target.Character:SetAttribute("ActionAt",workspace:GetServerTimeNow())
+ if escape then
+  self.serial=(self.serial or 0)+1
+  r.escape={token=tostring(self.serial)..":"..tostring(now),untilTime=now+duration,taps=0,last=-100}
+  self.c.send(target,"escape",{token=r.escape.token,duration=duration,required=3,taps=0})
+ end
+end
+function Abilities:struggle(player,token)
+ if not self.c.playing(player) then return end
+ local r=self.c.records()[player];local escape=r.escape;local now=os.clock()
+ if not escape or type(token)~="string" or escape.token~=token or now>escape.untilTime or now-escape.last<.12 then return end
+ escape.last=now;escape.taps=escape.taps+1
+ if escape.taps>=3 then
+  r.escape=nil;r.holdUntil=0
+  player.Character:SetAttribute("Action","escape");player.Character:SetAttribute("ActionAt",workspace:GetServerTimeNow())
+  self.c.send(player,"escapeClose")
+ else self.c.send(player,"escape",{token=token,duration=escape.untilTime-now,required=3,taps=escape.taps}) end
+end
 function Abilities:enemies(player,range,requireSight)
  local result={};local root=self.c.body(player);if not root then return result end
  local role=self.c.records()[player].entry.role
@@ -27,7 +53,10 @@ function Abilities:damage(player,target,amount)
  return true
 end
 function Abilities:slow(player,speed,duration)
- local r=self.c.records()[player];if r then r.slowSpeed=speed;r.slowUntil=os.clock()+duration end
+ local r=self.c.records()[player];if r then
+  r.slowSpeed=speed;r.slowUntil=os.clock()+duration
+  if player.Character then player.Character:SetAttribute("StunnedUntil",workspace:GetServerTimeNow()+duration) end
+ end
 end
 function Abilities:direction(player,aim)
  local root=self.c.body(player)
@@ -64,7 +93,7 @@ end
 function Abilities:cast(player,slot,aim)
  if not self.c.playing(player) or type(slot)~="number" or slot%1~=0 then return end
  local record=self.c.records()[player];local list=Config[record.entry.id];local ability=list and list[slot]
- if not ability or record.itemUse or record.channel then return end
+ if not ability or record.itemUse or record.channel or (record.holdUntil or 0)>os.clock() then return end
  record.cooldowns=record.cooldowns or {}
  local now=os.clock()
  if (record.cooldowns[ability.id] or 0)>now then return end
@@ -85,11 +114,25 @@ function Abilities:cast(player,slot,aim)
  end
  record.cooldowns[ability.id]=now+ability.cooldown;record.energy.value=math.max(0,record.energy.value-ability.cost)
  record.abilitiesUsed=(record.abilitiesUsed or 0)+1
- player.Character:SetAttribute("Action",ability.id);player.Character:SetAttribute("ActionAt",workspace:GetServerTimeNow())
- self.c.effect({kind=kind,position=root.Position,color=record.entry.role=="Asesino" and "red" or "blue",duration=.45,radius=kind=="areaDamage" and ability.range or 3})
+ local punching=ability.id=="cane" and (record.caneAwayUntil or 0)>now
+ player.Character:SetAttribute("Action",punching and "punch" or ability.id);player.Character:SetAttribute("ActionAt",workspace:GetServerTimeNow())
+ self.c.effect({kind=ability.id=="sixthHour" and "transformation" or kind,ability=punching and "punch" or ability.id,model=player.Character,position=root.Position,color=record.entry.role=="Asesino" and "red" or "blue",duration=.45,radius=kind=="areaDamage" and ability.range or 3})
+ local function perform()
+ if not self.c.playing(player) or self.c.records()[player]~=record then return end
+ now=os.clock();root,h=self.c.body(player)
+ enemies=self:enemies(player,punching and 6 or ability.range,true);target=enemies[1]
  if kind=="melee" then if target then self:damage(player,target,ability.amount) end
+ elseif kind=="behind" and target then
+  self:hold(player,target,"grabbed",.55,false)
+  local grabbed=target
+  self:later(player,.5,function()
+   if self.c.playing(grabbed) and self.c.visible(player,grabbed) then
+    local victim=self.c.body(grabbed);local source=self.c.body(player)
+    if (victim.Position-source.Position).Magnitude<=10 then victim.AssemblyLinearVelocity=source.CFrame.LookVector*18+Vector3.new(0,9,0) end
+   end
+  end)
  elseif kind=="stun" then if target then self:slow(target,ability.amount,ability.duration) end
- elseif kind=="pull" then
+ elseif kind=="pull" and target then
   self:damage(player,target,ability.amount);self:slow(target,6,ability.duration)
   local targetRoot=self.c.body(target);local delta=root.Position-targetRoot.Position
   if delta.Magnitude>.1 then targetRoot.AssemblyLinearVelocity=delta.Unit*30+Vector3.new(0,8,0) end
@@ -113,7 +156,33 @@ function Abilities:cast(player,slot,aim)
   local models={}
   for _,other in ipairs(self:enemies(player,ability.range,false)) do table.insert(models,other.Character) end
   self.c.send(player,"reveal",{models=models,duration=ability.duration})
- elseif kind=="ray" or kind=="bacon" or kind=="blast" then
+ elseif kind=="bacon" or kind=="caneThrow" then
+  local other,point=self:ray(player,direction,ability.range)
+  local flight=math.clamp((point-root.Position).Magnitude/45,.12,.8)
+  self.c.effect({kind="projectile",projectile=kind=="bacon" and "bacon" or "cane",model=player.Character,position=root.Position,finish=point,duration=flight,color="blue"})
+  if kind=="caneThrow" then
+   record.caneAwayUntil=now+flight*2+.2
+   player.Character:SetAttribute("CaneAwayUntil",workspace:GetServerTimeNow()+flight*2+.2)
+   self:later(player,flight,function()
+    local hand=self.c.body(player)
+    self.c.effect({kind="projectile",projectile="cane",model=player.Character,position=point,finish=hand.Position,duration=flight,returning=true,color="blue"})
+   end)
+   self:later(player,flight*2+.2,function()
+    player.Character:SetAttribute("CaneAwayUntil",0)
+    local actionAt=player.Character:GetAttribute("ActionAt") or 0
+    if workspace:GetServerTimeNow()-actionAt>.55 then player.Character:SetAttribute("Action","caneRecover");player.Character:SetAttribute("ActionAt",workspace:GetServerTimeNow()) end
+   end)
+  end
+  self:later(player,flight,function()
+   self.c.effect({kind="burst",position=point,color="blue",radius=1.4,duration=.25})
+   if other and self.c.playing(other) and (self.c.body(other).Position-point).Magnitude<=5 then
+    local otherRecord=self.c.records()[other]
+    if kind=="bacon" and otherRecord.entry.role==record.entry.role then
+     local _,otherH=self.c.body(other);otherH.Health=math.min(otherH.MaxHealth,otherH.Health+ability.amount)
+    elseif otherRecord.entry.role~=record.entry.role then self:slow(other,kind=="caneThrow" and ability.amount or 8,ability.duration) end
+   end
+  end)
+ elseif kind=="ray" or kind=="blast" then
   local other,point=self:ray(player,direction,ability.range)
   self.c.effect({kind="beam",position=root.Position,finish=point,color=kind=="blast" and "red" or "blue",duration=.35})
   if kind=="blast" then
@@ -123,10 +192,8 @@ function Abilities:cast(player,slot,aim)
    end
   elseif other and self.c.playing(other) then
    local otherRecord=self.c.records()[other]
-   if kind=="bacon" and otherRecord.entry.role==record.entry.role then
-    local _,otherH=self.c.body(other);otherH.Health=math.min(otherH.MaxHealth,otherH.Health+ability.amount)
-   elseif otherRecord.entry.role~=record.entry.role then
-    if kind=="ray" then self:damage(player,other,ability.amount) end
+   if otherRecord.entry.role~=record.entry.role then
+    self:damage(player,other,ability.amount)
     self:slow(other,8,ability.duration)
    end
   end
@@ -134,20 +201,34 @@ function Abilities:cast(player,slot,aim)
   for _,other in ipairs(enemies) do if kind=="areaSlow" then self:slow(other,ability.amount,ability.duration) else self:damage(player,other,ability.amount) end end
  elseif kind=="slam" or kind=="pounce" then
   root.AssemblyLinearVelocity=root.CFrame.LookVector*(kind=="pounce" and 34 or 12)+Vector3.new(0,22,0)
-  table.insert(self.pending,{player=player,at=now+.5,range=ability.range,amount=ability.amount,slow=kind=="slam"})
+  table.insert(self.pending,{player=player,at=now+.5,range=ability.range,amount=ability.amount,slow=kind=="slam",pounce=kind=="pounce"})
  elseif kind=="fire" then
   local _,point=self:ray(player,direction,18)
   table.insert(self.zones,{player=player,position=point,expires=now+ability.duration,next=now,radius=ability.range,damage=ability.amount})
   self.c.effect({kind="fire",position=point,color="red",radius=ability.range,duration=ability.duration})
  end
+ end
+ local windup=Timing[ability.id] or 0
+ if windup>0 then self:later(player,windup,perform) else perform() end
 end
 function Abilities:tick()
  local now=os.clock()
+ for i=#self.scheduled,1,-1 do
+  local item=self.scheduled[i]
+  if now>=item.at then
+   table.remove(self.scheduled,i)
+   if self.c.playing(item.player) and self.c.records()[item.player]==item.record then item.callback() end
+  end
+ end
  for i=#self.pending,1,-1 do
   local impact=self.pending[i]
   if now>=impact.at then
    if self.c.playing(impact.player) then
-    for _,other in ipairs(self:enemies(impact.player,impact.range,true)) do self:damage(impact.player,other,impact.amount);if impact.slow then self:slow(other,6,2) end end
+    for _,other in ipairs(self:enemies(impact.player,impact.range,true)) do
+     self:damage(impact.player,other,impact.amount)
+     if impact.slow then self:slow(other,6,2) end
+     if impact.pounce and self.c.playing(other) then self:hold(impact.player,other,"pinned",1.6,true) end
+    end
     self.c.effect({kind="burst",position=self.c.body(impact.player).Position,color="blue",radius=impact.range,duration=.6})
    end
    table.remove(self.pending,i)
@@ -164,6 +245,7 @@ function Abilities:tick()
  for player,record in pairs(self.c.records()) do
   if self.c.playing(player) then
    local root,h=self.c.body(player)
+   if record.escape and now>=record.escape.untilTime then record.escape=nil;self.c.send(player,"escapeClose") end
    if record.channel then
     local channel=record.channel
     if (record.lastDamage or 0)>channel.started or (root.Position-channel.position).Magnitude>3 then record.channel=nil
@@ -174,6 +256,7 @@ function Abilities:tick()
 end
 function Abilities:speed(player,base)
  local r=self.c.records()[player];local now=os.clock()
+ if (r.holdUntil or 0)>now then return 0 end
  if r.itemUse or r.channel then return 8 end
  if (r.boostUntil or 0)>now then base=math.max(base,r.boostSpeed) end
  if (r.drinkUntil or 0)>now then base=base*require(RS.Shared.ItemConfig).energyDrink.speedMultiplier end
@@ -187,6 +270,7 @@ function Abilities:hud(player)
  for key,label in pairs({shieldUntil="ESCUDO",boostUntil="VELOCIDAD",slowUntil="RALENTIZADO",drinkUntil="ENERGÍA INFINITA · SPEED III",linkUntil="VINCULADO",invulnerableUntil="FANTASMA"}) do if (r[key] or 0)>now then table.insert(statuses,label) end end
  if r.itemUse then table.insert(statuses,"MEDKIT · "..math.max(0,math.ceil(r.itemUse.untilTime-now)).." s") end
  if r.channel then table.insert(statuses,"REPARANDO") end
+ if r.escape then table.insert(statuses,"PULSA E · ESCAPAR") end
  return {character=r.entry.id,cooldowns=cooldowns,statuses=statuses,items=r.items or {},carried=self.c.rules():carried(player.UserId)}
 end
 return Abilities

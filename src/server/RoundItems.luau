@@ -34,9 +34,11 @@ function Items:use(player,slot)
  if kind=="medkit" then
   if h.Health>=h.MaxHealth then return end
   r.itemUse={kind=kind,slot=slot,started=now,untilTime=now+7,position=root.Position}
+  player.Character:SetAttribute("ItemAction","medkit");player.Character:SetAttribute("ItemActionUntil",workspace:GetServerTimeNow()+7)
   self.c.send(player,"message","Usando Medkit: permanece quieto durante 7 segundos.")
  else
   table.remove(r.items,slot);r.drinkUntil=now+6;r.energy.value=100;r.energy.exhausted=false
+  player.Character:SetAttribute("ItemAction","drink");player.Character:SetAttribute("ItemActionUntil",workspace:GetServerTimeNow()+1.1)
   self.c.send(player,"message","Energy Drink · 6 segundos de energía infinita y Speed III.")
   self.c.send(player,"sfx","item")
  end
@@ -48,7 +50,7 @@ function Items:tick()
    if not self.c.playing(player) then r.itemUse=nil
    else
     local root,h=self.c.body(player);local use=r.itemUse
-    if (root.Position-use.position).Magnitude>3 or (r.lastDamage or 0)>use.started then r.itemUse=nil;self.c.send(player,"message","Medkit interrumpido; conservas el objeto.")
+    if (root.Position-use.position).Magnitude>3 or (r.lastDamage or 0)>use.started then r.itemUse=nil;player.Character:SetAttribute("ItemActionUntil",0);self.c.send(player,"message","Medkit interrumpido; conservas el objeto.")
     elseif now>=use.untilTime then
      if r.items[use.slot]=="medkit" then table.remove(r.items,use.slot);h.Health=h.MaxHealth;self.c.send(player,"sfx","item") end
      r.itemUse=nil

@@ -9,12 +9,18 @@ local function vec(x,y,z) return setmetatable({X=x or 0,Y=y or 0,Z=z or 0},vmt) 
 vmt.__add=function(a,b)return vec(a.X+b.X,a.Y+b.Y,a.Z+b.Z)end
 vmt.__sub=function(a,b)return vec(a.X-b.X,a.Y-b.Y,a.Z-b.Z)end
 vmt.__div=function(a,b)return vec(a.X/b,a.Y/b,a.Z/b)end
+vmt.__unm=function(a)return vec(-a.X,-a.Y,-a.Z)end
 vmt.__mul=function(a,b)if type(a)=='number' then a,b=b,a end return vec(a.X*b,a.Y*b,a.Z*b)end
 vmt.__index=function(a,k)
  if k=='Magnitude' then return math.sqrt(a.X*a.X+a.Y*a.Y+a.Z*a.Z) end
+ if k=='Unit' then return a/math.sqrt(a.X*a.X+a.Y*a.Y+a.Z*a.Z) end
+ if k=='Dot' then return function(self,b)return self.X*b.X+self.Y*b.Y+self.Z*b.Z end end
+ if k=='Cross' then return function(self,b)return vec(self.Y*b.Z-self.Z*b.Y,self.Z*b.X-self.X*b.Z,self.X*b.Y-self.Y*b.X)end end
  if k=='Lerp' then return function(self,b,t)return self+(b-self)*t end end
 end
 Vector3={new=vec};Vector2={new=function(x,y)return {x,y}end};UDim2={fromScale=function(x,y)return {x,y}end}
+UDim={new=function(a,b)return {a,b}end}
+math.clamp=function(value,a,b)return math.max(a,math.min(b,value))end
 local cmt={}
 local function cf(p,r) return setmetatable({p=p or vec(),r=r or {1,0,0,0,1,0,0,0,1}},cmt)end
 local function transform(r,p)return vec(r[1]*p.X+r[2]*p.Y+r[3]*p.Z,r[4]*p.X+r[5]*p.Y+r[6]*p.Z,r[7]*p.X+r[8]*p.Y+r[9]*p.Z)end
@@ -22,8 +28,15 @@ cmt.__mul=function(a,b)
  local r={};for i=0,2 do for j=0,2 do local n=0;for k=0,2 do n=n+a.r[i*3+k+1]*b.r[k*3+j+1] end;r[i*3+j+1]=n end end
  return cf(a.p+transform(a.r,b.p),r)
 end
-cmt.__index=function(a,k)if k=='Position' then return a.p elseif k=='Rotation' then return cf(vec(),a.r) end end
+cmt.__index=function(a,k)
+ if k=='Position' then return a.p elseif k=='Rotation' then return cf(vec(),a.r)
+ elseif k=='Inverse' then return function(self)
+  local r=self.r;local transposed={r[1],r[4],r[7],r[2],r[5],r[8],r[3],r[6],r[9]}
+  return cf(transform(transposed,-self.p),transposed)
+ end end
+end
 CFrame={new=function(x,y,z)if type(x)=='table' then return cf(x) end return cf(vec(x,y,z))end}
+CFrame.fromMatrix=function(p,x,y,z)z=z or x:Cross(y);return cf(p,{x.X,y.X,z.X,x.Y,y.Y,z.Y,x.Z,y.Z,z.Z})end
 CFrame.Angles=function(x,y,z)
  local cx,sx,cy,sy,cz,sz=math.cos(x),math.sin(x),math.cos(y),math.sin(y),math.cos(z),math.sin(z)
  return cf(nil,{1,0,0,0,cx,-sx,0,sx,cx})*cf(nil,{cy,0,sy,0,1,0,-sy,0,cy})*cf(nil,{cz,-sz,0,sz,cz,0,0,0,1})
@@ -87,7 +100,7 @@ def normalize(s):
     s=re.sub(r'for (_,\w+) in (\{[^\n]+?\}) do',r'for \1 in ipairs(\2) do',s)
     return s.replace('pocket.CFrame*=CFrame.Angles(0,0,math.pi/2)','pocket.CFrame=pocket.CFrame*CFrame.Angles(0,0,math.pi/2)')
 def main():
-    out=ROOT/'dist/preview-scene.json'
+    out=ROOT/'dist/preview-scene-v3.json'
     roster=(ROOT/'src/shared/Roster.luau').read_text()
     source=normalize((ROOT/'src/shared/Lobby.luau').read_text())
     appearance=(ROOT/'src/shared/Appearance.luau').read_text()
@@ -97,7 +110,7 @@ def main():
     camp='local camp=Instance.new("Model")'+world_source.split('local camp=Instance.new("Model")',1)[1].split('local npcPositions',1)[0]
     extension=(ROOT/'src/server/Camp.luau').read_text()
     script=(MOCK+bootstrap+'\nlocal roster=(function()\n'+roster+'\nend)()\nlocal build=(function()\n'+source
-        +'\nend)()\nlocal world=Instance.new("Folder")\nlocal remote={FireClient=function()end}\nbuild(world,roster,remote)\n'
+        +'\nend)()\nlocal world=Instance.new("Folder")\nlocal remote={FireClient=function()end}\nbuild(world,roster,remote,{},false)\n'
         +helpers+'\n'+camp+'\nlocal Camp=(function()\n'+extension+'\nend)()\nCamp.extend(world,remote,World)\ndump('+repr(str(out))+')')
     lib=ctypes.CDLL('liblua5.4.so.0');lib.luaL_newstate.restype=ctypes.c_void_p
     lib.luaL_openlibs.argtypes=[ctypes.c_void_p];lib.luaL_loadstring.argtypes=[ctypes.c_void_p,ctypes.c_char_p]

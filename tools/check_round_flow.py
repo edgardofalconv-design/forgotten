@@ -69,6 +69,7 @@ local Profiles={new=function()
  reward=function(_,p,receipt,kind)table.insert(paid,{id=p.UserId,kind=kind})end}
 end}
 shared.CharacterFactory=Factory;shared.CatalogCharacter={load=function()return false end,ready=function()return true end}
+shared.AvatarCatalog={load=function()return false end}
 shared.NativeRoundCharacter=Native;shared.Cosmetics={apply=function()end}
 local rs={Shared=shared,FindFirstChild=function(_,name)if name=="GameEvent" then return remote end end}
 services.Players=players;services.ReplicatedStorage=rs;services.RunService={IsStudio=function()return true end}

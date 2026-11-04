@@ -7,6 +7,7 @@ local Assignment=require(RS.Shared.RoleAssignment)
 local Stamina=require(RS.Shared.Stamina)
 local Factory=require(RS.Shared.CharacterFactory)
 local Catalog=require(RS.Shared.CatalogCharacter)
+local AvatarCatalog=require(RS.Shared.AvatarCatalog)
 local Native=require(RS.Shared.NativeRoundCharacter)
 local World=require(script.World)
 local Objectives=require(script.Objectives)
@@ -67,6 +68,7 @@ local function changed()
 end
 local function canInteract(player,part)
  if not playing(player) or entryFor(player).role~="Superviviente" then return false end
+ if (participants[player].holdUntil or 0)>os.clock() then return false end
  local root=body(player)
  if (root.Position-part.Position).Magnitude>12 then return false end
  local params=RaycastParams.new();params.FilterType=Enum.RaycastFilterType.Exclude;params.FilterDescendantsInstances={player.Character}
@@ -181,6 +183,7 @@ remote.OnServerEvent:Connect(function(player,action,value,extra)
   if playing(player) and type(value)=="boolean" then participants[player].energy.requested=value end
  elseif action=="skill" then useSkill(player,value,extra)
  elseif action=="attack" then attack(player,value)
+ elseif action=="struggle" then abilities:struggle(player,value)
  elseif action=="challenge" then if objectives then objectives:answer(player,value,extra) end
  elseif action=="challengeCancel" then if objectives then objectives:cancel(player) end end
 end)
@@ -232,6 +235,14 @@ local function preloadCatalog()
  end
 end
 task.spawn(preloadCatalog)
+local function preloadAvatars()
+ if AvatarCatalog.load() then
+  for index,entry in ipairs(roster) do
+   if entry.id~="junkbot" then world.refreshNPC(index);refreshPreview(entry) end
+  end
+ end
+end
+task.spawn(preloadAvatars)
 local function candidates()
  local list={}
  for _,player in ipairs(Players:GetPlayers()) do
@@ -262,7 +273,7 @@ local function beginRound(list,isPractice)
  end
  if not plan then return false end
  participants={};rules=Rules.new(isPractice);practice=isPractice;killerUserId=killer;musicKey="";result="";resultsData=nil
- abilities.zones={};abilities.pending={}
+ abilities.zones={};abilities.pending={};abilities.scheduled={}
  phase="Ronda"
  local survivorIndex=0
  for _,assignment in ipairs(plan) do
@@ -394,4 +405,5 @@ while true do
   end
  end
  if phase=="Lobby" and not Catalog.ready() then task.spawn(preloadCatalog) end
+ if phase=="Lobby" then task.spawn(preloadAvatars) end
 end

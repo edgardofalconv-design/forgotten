@@ -29,6 +29,7 @@ local oldIndex=omt.__index
 omt.__index=function(o,key)
  if key=="Triggered" then o.props[key]=o.props[key] or signal();return o.props[key] end
  if key=="SetAttribute" then return function(self,k,v)self.props[k]=v end end
+ if key=="GetAttribute" then return function(self,k)return self.props[k]end end
  return oldIndex(o,key)
 end
 local oldNew=Instance.new
@@ -69,9 +70,13 @@ Stamina.step(energy,.5,true,true);assert(energy.value==100 and energy.running)
     core=module('RoundRules.luau','Rules')+module('Stamina.luau','Stamina')+module('RoleAssignment.luau','Assignment')+module('Roster.luau','roster')
     run_lua(MOCK+core+tests,'V2: reglas V1 + recoger/depositar/soltar cápsulas, LMS y bebida')
     factory=(MOCK+FACTORY_MOCK+module('Appearance.luau','Appearance')+module('ImportedAppearance.luau','Imported')
-        +module('Roster.luau','roster')+'\nscript={Parent={Appearance=Appearance,ImportedAppearance=Imported,CatalogCharacter={clone=function()return nil end}}}\nrequire=function(m)return m end\n'
+        +module('Roster.luau','roster')+'\nscript={Parent={Appearance=Appearance,ImportedAppearance=Imported,CatalogCharacter={clone=function()return nil end},AvatarCatalog={clone=function()return nil end}}}\nrequire=function(m)return m end\n'
+        +module('CharacterVisualData.luau','VisualData')+'\nscript.Parent.CharacterVisualData=VisualData\n'
+        +module('VisualGeometry.luau','Geometry')+'\nscript.Parent.VisualGeometry=Geometry\n'
+        +module('CharacterVisuals.luau','Visuals')+'\nscript.Parent.CharacterVisuals=Visuals\n'
         +module('CharacterFactory.luau','Factory')+FACTORY_TESTS+module('Cosmetics.luau','Cosmetics')+r'''
 for _,entry in ipairs(roster) do for tier=0,4 do
+ nodes={}
  local model=Factory.create(entry);local h=model:FindFirstChildOfClass("Humanoid")
  local health,speed=h.MaxHealth,h.WalkSpeed
  Cosmetics.apply(model,entry.id,{skin=entry.id..(tier==0 and ":base" or ":m"..tier),cosmetic="cosmetic:scarf"})
@@ -201,8 +206,9 @@ s=Challenge.new("wires",time,random);assert(Challenge.input(s,1,time+61)=="expir
 def challenges_and_objectives():
     base=MOCK+COMMON+module('ChallengeRules.luau','Challenge')+'\nShared.ChallengeRules=Challenge\n'
     run_lua(base+CHALLENGES,'siete minijuegos: secuencias, reflejos, cuerda, interruptores y dos laberintos resolubles')
+    base += '\nColorSequence={new=function(c)return c end};services.CollectionService={AddTag=function(m)end}\n'+module('GeneratorVisuals.luau','Generator')+'\nShared.GeneratorVisuals=Generator\n'
     tests=r'''
-local p1={UserId=1,SetAttribute=function()end};local p2={UserId=2,SetAttribute=function()end}
+local p1={UserId=1,Character=Instance.new("Model"),SetAttribute=function()end};local p2={UserId=2,SetAttribute=function()end}
 local near={[p1]=true,[p2]=true};local messages={};local rewards=0
 local rules=Rules.new(false)
 local world={arena=Instance.new("Model"),center=Vector3.new(),depotPosition=Vector3.new(0,0,10),generatorPositions={},puzzlePositions={}}
@@ -211,13 +217,19 @@ local o=Objectives.new(world,rules,{canInteract=function(p)return near[p]end,sen
 local function answer(p,value)local s=o.sessions[p];o:answer(p,s.token,value)end
 o.generators[1].prompt.Triggered:Fire(p1)
 local s=o.sessions[p1];assert(s and s.challenge.kind=="wires")
+assert(p1.Character:GetAttribute("RepairStage")==1)
+local gen=o.generators[1];assert(gen.base.CanCollide and gen.base.Transparency==1 and not gen.smoke.Enabled)
+local parts=0;for _,part in ipairs(gen.model:GetChildren()) do if part:IsA("BasePart") then parts=parts+1;if part~=gen.base then assert(not part.CanCollide and not part.CanQuery)end end end
+assert(parts>30 and parts<65)
 o:answer(p1,"forged-token",1);assert(s.challenge.step==1)
 for _,v in ipairs(s.challenge.sequence) do advance(.2);answer(p1,v) end
 assert(s.stage==2 and s.challenge.kind=="switches")
+assert(p1.Character:GetAttribute("RepairStage")==2 and gen.model:GetAttribute("RepairStage")==2)
 for _,v in ipairs({1,3,4}) do advance(.2);answer(p1,v) end
 assert(s.stage==3)
 for i=1,3 do time=s.challenge.readyAt+.9;answer(p1,"pull") end
 assert(rules.generatorCount==1 and rules.remaining==230 and rewards==1)
+assert(gen.model:GetAttribute("Running") and gen.smoke.Enabled and p1.Character:GetAttribute("RepairStage")==0)
 o.generators[1].prompt.Triggered:Fire(p2);assert(not o.sessions[p2])
 o.stations[1].pickup.Triggered:Fire(p1);assert(rules:carried(1)==0)
 o.stations[1].solve.Triggered:Fire(p1);o.stations[1].solve.Triggered:Fire(p2)
@@ -243,7 +255,8 @@ o:destroy();o.generators[2].prompt.Triggered:Fire(p1);assert(rules.generatorCoun
     run_lua(base+WORLD+module('RoundRules.luau','Rules')+server('Objectives.luau','Objectives')+tests,'controlador objetivos: distancia, tokens, tres etapas, depósitos, abandonos y duplicados')
 
 def items_and_abilities():
-    setup=MOCK+COMMON+WORLD+module('ItemConfig.luau','ItemConfig')+module('AbilityConfig.luau','AbilityConfig')+module('Stamina.luau','Stamina')+r'''
+    setup=MOCK+COMMON+WORLD+module('ItemConfig.luau','ItemConfig')+module('AbilityConfig.luau','AbilityConfig')+module('AbilityTiming.luau','AbilityTiming')+module('Stamina.luau','Stamina')+r'''
+Shared.AbilityTiming=AbilityTiming
 Shared.ItemConfig=ItemConfig;Shared.AbilityConfig=AbilityConfig;Shared.CharacterFactory={}
 local vindex=vmt.__index
 vmt.__index=function(a,k)if k=="Unit" then return a/a.Magnitude end;return vindex(a,k)end
@@ -289,23 +302,23 @@ local a=Abilities.new(context);p.root.Position=Vector3.new(0,3,0);p.h.Health=100
 local energy=records[p].energy.value
 a:cast(p,"1");a:cast(p,100);a:cast(p,0/0);assert(records[p].energy.value==energy)
 records[p].energy.value=0;a:cast(p,1);assert(not records[killer].slowUntil)
-records[p].energy.value=100;sight=false;a:cast(p,1);assert(not records[killer].slowUntil)
-advance(20);sight=true;a:cast(p,1);assert(records[killer].slowUntil==time+3)
+records[p].energy.value=100;sight=false;a:cast(p,1);advance(.3);a:tick();assert(not records[killer].slowUntil)
+advance(20);sight=true;a:cast(p,1);advance(.3);a:tick();assert(records[killer].slowUntil==time+3)
 local cooldown=records[p].cooldowns.cane;local after=records[p].energy.value
 a:cast(p,1);assert(records[p].cooldowns.cane==cooldown and records[p].energy.value==after)
 a:cast(p,2);assert(records[p].shield==.5)
 ally.root.Position=Vector3.new(30,3,0)
-a:cast(killer,1);assert(p.h.Health==87.5 and ally.h.Health==50)
+a:cast(killer,1);assert(p.h.Health==100);advance(.3);a:tick();assert(p.h.Health==87.5 and ally.h.Health==50)
 a:cast(killer,1);assert(p.h.Health==87.5)
 assert(not a:damage(p,ally,50) and ally.h.Health==50)
 records[p].invulnerableUntil=time+1;assert(not a:damage(killer,p,50))
-advance(2);sight=false;a:cast(killer,1);assert(p.h.Health==87.5)
+advance(2);sight=false;a:cast(killer,1);advance(.3);a:tick();assert(p.h.Health==87.5)
 records[killer].status=false;advance(5);a:cast(killer,1);assert(p.h.Health==87.5)
 records[p].drinkUntil=time+6;assert(a:speed(p,16)==16*1.35)
 records[p].itemUse={};assert(a:speed(p,16)==8);records[p].itemUse=nil
 local count=0
 for id,list in pairs(AbilityConfig) do if id~="keys" then for _,skill in ipairs(list) do assert(skill.cooldown>0 and skill.cost>=0 and skill.provisional);count=count+1 end end end
-assert(count==25 and effects>0)
+assert(count==26 and effects>0)
 -- Exercise every ability through the real cast dispatcher, with deterministic ray hits.
 a.ray=function()return killer,killer.root.Position end
 a.teleport=function()return true end
@@ -320,7 +333,7 @@ for id,list in pairs(AbilityConfig) do if id~="keys" then
   local before=effects
   a:cast(p,slot)
   assert(records[p].cooldowns[skill.id]>time and effects>before,id..":"..skill.id)
-  advance(.6);a:tick()
+  advance(.6);a:tick();advance(.2);a:tick()
   if skill.kind=="repair" then advance(2);a:tick();assert(p.h.Health==55 and not records[p].channel) end
   if skill.kind=="melee" or skill.kind=="ray" or skill.kind=="slam" or skill.kind=="pounce" or skill.kind=="pull" or skill.kind=="blast" or skill.kind=="areaDamage" or skill.kind=="fire" then assert(killer.h.Health<100,skill.id) end
   if skill.kind=="reveal" then assert(messages.reveal and #messages.reveal.models==1) end
@@ -330,6 +343,26 @@ for id,list in pairs(AbilityConfig) do if id~="keys" then
   if skill.kind=="heal" or skill.kind=="teamHeal" or skill.kind=="lastFighter" then assert(p.h.Health>30) end
  end
 end end
+-- V3 timing: an attack cannot hit before its pose contact, twice, or in a later life.
+records[p]={entry={id="guest666",role="Asesino"},energy=Stamina.new(),status=true,items={}}
+records[killer]={entry={id="pelotocino",role="Superviviente"},energy=Stamina.new(),status=true}
+records[ally].entry.role="Asesino";p.h.Health=100;killer.h.Health=100;sight=true
+a:cast(p,1);advance(.1);a:tick();assert(killer.h.Health==100)
+advance(.13);a:tick();assert(killer.h.Health==75)
+a:tick();assert(killer.h.Health==75)
+advance(2);a:cast(p,1);records[p].status=false;advance(.3);a:tick();assert(killer.h.Health==75)
+records[p].status=true;advance(2);a:cast(p,1)
+local previous=records[p];records[p]={entry=previous.entry,energy=Stamina.new(),status=true,items={}}
+advance(.3);a:tick();assert(killer.h.Health==75)
+-- Escape input is scoped to the pinned victim, expires, and is rate-limited.
+a:hold(p,killer,"pinned",1.6,true)
+local token=records[killer].escape.token
+assert(a:speed(killer,16)==0)
+a:struggle(killer,"forged");assert(records[killer].escape.taps==0)
+a:struggle(killer,token);a:struggle(killer,token);assert(records[killer].escape.taps==1)
+advance(.15);a:struggle(killer,token);advance(.15);a:struggle(killer,token)
+assert(not records[killer].escape and a:speed(killer,16)==16)
+a:hold(p,killer,"pinned",1.6,true);advance(2);a:tick();assert(not records[killer].escape)
 items:destroy()
 '''
     run_lua(setup+server('RoundItems.luau','Items')+server('Abilities.luau','Abilities')+tests,'objetos y combate: ranuras, 7 s, cancelación, bebida 6 s, alcance, energía, escudos y cooldowns')

@@ -1,47 +1,36 @@
-# FORGOTTEN — V2 de prueba
+# FORGOTTEN — V3 de prueba
 
-Abre **Forgotten-V2.rbxlx** en Roblox Studio, pulsa **Play/F5** y elige **PROBAR SOLO**. El ZIP contiene el lugar, guía, informe y proyecto fuente. No necesitas PowerShell, Rojo ni pegar código.
+Extrae **Forgotten-V3.zip**, abre **Forgotten-V3.rbxlx** en Roblox Studio y pulsa **Play/F5**. En **PERSONAJES** selecciona un superviviente; vuelve a **JUGAR → PROBAR SOLO**. No necesitas comandos, Rojo ni pegar código.
 
-**Estado real:** implementación comprobada localmente con Lua 5.4, APIs simuladas y XML. Falta ejecutarla en Roblox Studio. Las apariencias provisionales, retratos, canciones y animaciones finales no se presentan como terminados.
+V3 continúa V2: conserva sus nueve mapas, reglas, vida, energía, tienda, inventario, monedas, skins, Milestones, música configurable, puzles y LMS. V1 y V2 mantienen sus entregas originales. El campamento es únicamente el lobby.
 
-## Incluido
+## Cambios visibles
 
-- Cabaña conservada, campamento ampliado, caminos, fogata y club house con tienda, personajes e inventario. El campamento sigue siendo exclusivamente el lobby.
-- Nueve escenarios procedurales temáticos: Disaster Island, Abandoned Pizza Place, Forgotten Heights, Zombie Research Facility, Cursed Manor, Forgotten Robloxia, Junkbot Factory, Corrupted Arcade y Baller's Arena. Comparten una base de circulación, con arquitectura y obstáculos propios de cada tema. Solo se instancia un mapa de partida a la vez.
-- Seis personajes independientes y 25 habilidades. Yellow Guy es amarillo con bastón; Junkbot conserva su cargador del paquete original 589. Los modelos provisionales se identifican como tales.
-- Generadores de cables, interruptores y cuerda; estaciones de memoria, piano, reflejos y laberinto; cápsulas transportables y depósito.
-- Medkit de 7 segundos y Energy Drink de 6 segundos; dos ranuras y una unidad por tipo, separadas de las cápsulas.
-- Forgotten Coins, cuatro cosméticos, inventario permanente, base y cuatro Milestones por personaje. Compras y recompensas de servidor; guardado con bloqueo de sesión y recibos contra duplicación.
-- HUD, selección, votación de mapas, vistas 3D, marcador, resultados y MVP. Animaciones procedurales, retratos provisionales y configuración de música/animaciones externas sin IDs ficticios.
+- Seis identidades: Pelotocino con cabello Bacon y mochila; Yellow Guy amarillo, azul y verde con bastón; Junkbot; Korblox Deathspeaker; Guest 666 oscuro con ojos rojos y sin capa; Tubers93 con guadaña curva y cadena.
+- Cabezas nativas de Roblox, ropa, accesorios, formas curvas y superficies propias articuladas. Los modelos instalados y validados tienen prioridad. Junkbot conserva el cargador original del paquete **589**. Se intenta localizar **Pal Hair** y **Korblox Deathspeaker** del creador Roblox, sin inventar identificadores.
+- Posturas propias de cada personaje, saltos, caída, aterrizaje, daño, muerte y reparación. Lanzamiento visible del mechón y del bastón, recuperación, estelas de armas, habilidades, victoria y MVP.
+- Generadores con motor, aletas, depósito, cables curvos, interruptores y arranque animado. Sus tres minijuegos mantienen las reglas de V2.
+- Luz más legible, vegetación por capas, helechos y piedras; límites de sombras, efectos locales y animación de NPC lejanos.
 
-## Abrir y probar
+**Estado real:** pruebas locales con Lua 5.4 y dobles de APIs, validación XML y renders de Blender. **No se ha ejecutado Roblox Studio aquí.** Los modelos propios son provisionales, no réplicas 1:1. Las animaciones son procedurales; no son clips finales publicados. El catálogo y la consolidación opcional con EditableMesh requieren comprobación real.
 
-1. Extrae el ZIP. Abre **Roblox Studio → Archivo → Abrir desde archivo → Forgotten-V2.rbxlx**.
-2. Pulsa **Play**, entra en **PERSONAJES** y elige un superviviente. En **MAPAS** puedes votar.
-3. Vuelve a **JUGAR → PROBAR SOLO**. No hay asesino ni LMS; esta práctica no concede monedas o maestría de partida.
-4. Repara dos generadores completando sus tres pasos. Resuelve tres estaciones, recoge las cápsulas con **E** y deposítalas junto a la salida.
-5. Con ambos requisitos y **1:00 o menos**, cruza físicamente la puerta. Volverás al campamento.
+## Primera partida
 
-WASD: moverse; espacio: saltar; Shift: correr; E: interactuar; Q/R/F/G/T/Y: habilidades; Z/X: objetos; clic: ataque del asesino; M: menú; Tab: marcador. También hay botones de acciones.
+1. Abre el archivo y pulsa **Play**. El lobby y los NPC actuales se construyen al jugar; la vista de edición es una maqueta estática del campamento.
+2. Elige un superviviente en **PERSONAJES**, vota un mapa si quieres y pulsa **JUGAR → PROBAR SOLO**.
+3. Repara dos generadores: cables, interruptores y tres tirones en verde. Resuelve tres puzles, recoge sus cápsulas con **E** y llévalas al depósito junto a la salida.
+4. Con ambos requisitos y **1:00 o menos**, atraviesa físicamente la salida para regresar al lobby.
 
-Para persecución, usa **Test/Prueba → Server & Clients con 3 clientes**: un asesino y dos supervivientes. El servidor equilibra equipos y conserva la selección para la siguiente ronda. Con 2 clientes comienza LMS: **1:30**, sin objetivos, puerta a **0:00**, escape físico obligatorio.
+WASD: moverse; espacio: saltar; Shift: correr; E: interactuar o liberarse; Q/R/F/G/T/Y: habilidades; Z/X: objetos; clic: ataque del asesino; M: menú; Tab: marcador. También hay botones. Yellow Guy lanza el bastón con **G** y lo recupera automáticamente.
 
-Normal: 4:00, cuatro generadores y cuatro estaciones. Requisitos: dos generadores y tres cápsulas **depositadas**. Cada generador descuenta 10 s; cada puzle, 5 s. LMS tiene prioridad musical y no termina automáticamente a cero.
+Para persecuciones: **Test/Prueba → Server & Clients → 3 clientes**. Dos clientes activan LMS: **1:30**, sin requisitos, puerta a **0:00** y escape físico. La práctica individual no concede monedas ni maestría de partida.
 
-## Guardado y recursos pendientes
+## Vistas y comprobaciones
 
-El HUD indica **Progreso de sesión** cuando Roblox no permite DataStore: se puede probar la tienda, pero esos cambios no persistirán ni sobrescribirán un perfil remoto. Studio usa **FORGOTTEN_Profiles_v2_Studio**; el juego publicado usa **FORGOTTEN_Profiles_v2**. Para verificar guardado real necesitas publicar una experiencia de prueba y habilitar su acceso a API.
+[Galería: frontal, lateral y trasera de los seis personajes](docs/V3_VISTAS.md). Son **renders de Blender**, con cabeza nativa aproximada y sombreado de Blender. Junkbot y Deathspeaker muestran las alternativas propias, no recursos descargados del catálogo. No son capturas del juego.
 
-Junkbot intenta cargar el original de Roblox; si falla, conserva un robot provisional identificado y permite reintentar. Los demás personajes usan rigs aproximados reemplazables: no son réplicas 1:1. Faltan modelos finales, referencias finales de Milestones, retratos, música/sonidos autorizados y clips finales de animación.
+[Cambios y archivos](CHANGELOG-V3.md) · [Pruebas y pendientes de Studio](docs/V3_PRUEBAS_Y_PENDIENTES.md).
 
-Los PNG PBR de assets/textures se conservan; hasta publicar imágenes y configurar MaterialPack se usan materiales nativos. Los valores nuevos de habilidades, precios, recompensas, maestría y Speed III son **experimentales**, no estadísticas definitivas aprobadas.
+Si el HUD indica **Progreso de sesión**, la tienda se puede probar, pero los cambios no se guardan al cerrar. Se conserva el espacio de datos V2: `FORGOTTEN_Profiles_v2_Studio` en Studio y `FORGOTTEN_Profiles_v2` en producción.
 
-## Desarrollo y conservación
-
-Un comando: **python3 tools/validate_and_build.py**. Comprueba y exporta la V2; requiere Python 3 y liblua5.4.so.0. No requiere Blender. La sintaxis adaptada no sustituye al compilador Luau.
-
-default.project.json mantiene Rojo y preserva modelos instalados en ServerStorage al sincronizar. El exportador incorpora los scripts y una vista estática del lobby; los escenarios interactivos se construyen al jugar.
-
-La V1 se conserva en sus artefactos originales y en backups/primera-prueba-v1-completa.zip. La construcción V2 comprueba sus hashes cuando existen y no los reconstruye. Los renders y FBX/GLB históricos se conservan localmente; no son capturas de V2 ni apariencias instaladas.
-
-Consulta **CHANGELOG-V2.md**, **docs/V2_PRUEBAS_Y_PENDIENTES.md**, **dist/VALIDACION-V2.txt** y **dist/INFORME-V2.json**. Los demás documentos históricos describen la primera prueba.
+Para desarrollo: `python3 tools/validate_and_build.py` comprueba y exporta V3 con Python 3 y `liblua5.4.so.0`. Blender solo se necesita para regenerar los renders. `default.project.json` conserva la configuración Rojo y las plantillas instaladas. Los constructores bloquean la sobrescritura de las entregas V1/V2.

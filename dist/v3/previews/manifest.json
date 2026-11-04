@@ -1,0 +1,20 @@
+{
+  "renderer": "Blender 4.3.2",
+  "studio_screenshot": false,
+  "geometry_sha256": "1789f79e3f6f1df6acd6c387d7cfee4dd6b1f576887e9be0d71057c52dcb7d79",
+  "rendered_at": "2026-11-04T16:23:48.775307+00:00",
+  "limitations": [
+    "Own provisional alternatives, not live catalog bodies",
+    "Native head approximation",
+    "Blender materials and lighting differ from Roblox"
+  ],
+  "images": {
+    "01-personajes-v3.png": "90b4977566f155eaec2abbaef6473d365535e98b15397e7d0ac0039ea7790180",
+    "02-pelotocino-tres-vistas.png": "acde6bff840757da1ada70736092f3130f56046ea83c2acd39746c59b0e9cd2b",
+    "03-yellowguy-tres-vistas.png": "a94fdbfcdb2d874388dbf6845bc2e57d6824abcac0e70b9de92ccb80376b26c8",
+    "04-junkbot-tres-vistas.png": "f875274f46b7bb776cda0d870e9338ca58c15325b5dd9974bc590fb2881577ab",
+    "05-deathspeaker-tres-vistas.png": "6d3c18aa3d026e68c4af39f2b8c918c336ba923190695704559f86cd57f91345",
+    "06-guest666-tres-vistas.png": "52de1e18585bc92c7c679c7557eea3d9fd235a698d4636ecd79f0f78c96736b7",
+    "07-tubers93-tres-vistas.png": "6681facbfead5761fed5eb5ff3d40ad1ffbfba22efe8ee2a0a7898314a282fcc"
+  }
+}

@@ -1,6 +1,7 @@
 local RS=game:GetService("ReplicatedStorage")
 local World=require(script.Parent.World)
 local Challenge=require(RS.Shared.ChallengeRules)
+local Generator=require(RS.Shared.GeneratorVisuals)
 local Objectives={};Objectives.__index=Objectives
 local tones={Color3.fromRGB(221,79,70),Color3.fromRGB(74,139,226),Color3.fromRGB(235,195,70),Color3.fromRGB(91,189,124)}
 function Objectives.new(world,rules,callbacks)
@@ -20,12 +21,9 @@ function Objectives.new(world,rules,callbacks)
   part.CanCollide=false;part.CanTouch=false;part.CanQuery=false;part.CastShadow=false;return part
  end
  for i,pos in ipairs(world.generatorPositions) do
-  local base=World.part(self.folder,"Generador "..i,Vector3.new(5,4,3),world.center+pos+Vector3.new(0,2,0),Color3.fromRGB(63,71,75))
-  local screen=decor("Panel generador "..i,Vector3.new(3,1,.15),base.Position+Vector3.new(0,.6,-1.6),tones[1])
-  local label=World.label(screen,"G"..i.." · CABLES / INTERRUPTORES / CUERDA")
-  for n=1,3 do decor("Cable",Vector3.new(.1,1.2,.1),base.Position+Vector3.new(-1+n*.55,-.6,-1.6),tones[n]) end
-  local control=prompt(base,"Reparar generador","Generador "..i,function(player)self:open(player,"generator",i)end)
-  self.generators[i]={base=base,screen=screen,label=label,prompt=control}
+  local view=Generator.build(self.folder,world.center+pos,World,i)
+  view.prompt=prompt(view.base,"Reparar generador","Generador "..i,function(player)self:open(player,"generator",i)end)
+  self.generators[i]=view
  end
  local kinds={"memory","piano","reflex","maze"}
  local titles={"MEMORIA","PIANO","REFLEJOS","LABERINTO"}
@@ -55,11 +53,16 @@ function Objectives.new(world,rules,callbacks)
  return self
 end
 function Objectives:publish(player,s)
+ if s.family=="generator" then
+  Generator.progress(self.generators[s.id],s.stage,s.challenge)
+  if player.Character then player.Character:SetAttribute("RepairStage",s.stage);player.Character:SetAttribute("RepairPullAt",self.generators[s.id].model:GetAttribute("PullAt") or 0) end
+ end
  self.callbacks.send(player,"challenge",{token=s.token,family=s.family,id=s.id,stage=s.stage,challenge=s.challenge,serverNow=workspace:GetServerTimeNow()})
 end
 function Objectives:open(player,family,id)
  local source=family=="generator" and self.generators[id] or self.stations[id]
  if not source or self.rules.mode=="LMS" or (family=="generator" and self.rules.generators[id]) or (family=="puzzle" and self.rules.puzzles[id]) then return end
+ self:cancel(player)
  self.serial=self.serial+1
  local kind=family=="generator" and "wires" or source.kind
  local s={family=family,id=id,base=source.base,stage=1,token=tostring(self.serial)..":"..tostring(workspace:GetServerTimeNow())}
@@ -78,10 +81,12 @@ function Objectives:answer(player,token,value)
   if s.family=="generator" and s.stage<3 then
    s.stage=s.stage+1;s.challenge=Challenge.new(s.stage==2 and "switches" or "rope",workspace:GetServerTimeNow(),math.random);self:publish(player,s);return
   end
+  if s.family=="generator" then Generator.progress(self.generators[s.id],s.stage,s.challenge) end
   self:cancel(player)
   if s.family=="generator" then
    if self.rules:completeGenerator(s.id) then
     local gen=self.generators[s.id];gen.prompt.Enabled=false;gen.screen.Color=tones[4];gen.label.Text="G"..s.id.." · ACTIVO"
+    Generator.complete(gen)
     if self.callbacks.reward then self.callbacks.reward(player,"generator","generator:"..s.id) end
     self.callbacks.changed()
    end
@@ -107,7 +112,10 @@ function Objectives:drop(player)
  player:SetAttribute("CarriedCapsules",0)
 end
 function Objectives:cancel(player)
- if self.sessions[player] then self.sessions[player]=nil;self.callbacks.send(player,"challengeClose") end
+ if self.sessions[player] then
+  if player.Character then player.Character:SetAttribute("RepairStage",0) end
+  self.sessions[player]=nil;self.callbacks.send(player,"challengeClose")
+ end
 end
 function Objectives:disableForLMS()
  for player in pairs(self.sessions) do self:cancel(player) end
