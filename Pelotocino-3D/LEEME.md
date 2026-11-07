@@ -1,6 +1,6 @@
-# Pelotocino — versión 2, avatar Roblox
+# Pelotocino — revisión 3 para evaluación
 
-La nueva referencia se utilizó para corregir la silueta: cuerpo delgado, brazos inclinados, manos de avatar, cabeza cilíndrica y cabello Pal Hair. Se conservan la camiseta azul con chaqueta negra, jeans negros con zapatillas blancas y la mochila básica marrón de la primera referencia.
+La nueva referencia se utilizó para corregir la silueta: cuerpo delgado, brazos inclinados, manos de avatar, cabeza más compacta con bordes redondeados y cabello Pal Hair. Se conservan la camiseta azul con chaqueta negra, jeans negros con zapatillas blancas y la mochila básica marrón de la primera referencia.
 
 El cuerpo usa las **14 mallas R15 del paquete oficial gratuito Man de Roblox**, escaladas. El cabello usa el recurso gratuito oficial Pal Hair. La camiseta es Blue and Black Motorcycle Shirt, que contiene el gráfico de la moto de la referencia; los pantalones son Black Jeans with White Shoes. La mochila y la cara son geometría creada para este modelo. No se han modificado FORGOTTEN V4, mapas ni scripts anteriores del juego.
 
@@ -10,7 +10,7 @@ El cuerpo usa las **14 mallas R15 del paquete oficial gratuito Man de Roblox**, 
 - `Pelotocino.blend`: malla editable, materiales, seis texturas empaquetadas, esqueleto de 16 huesos y clips Walk, Run y Jump. Las pistas NLA están silenciadas al abrir para mostrar la pose de reposo. Activa una pista por vez para verla.
 - `Pelotocino.glb`: geometría, skin, esqueleto, texturas incorporadas y tres clips. Para insertar en Studio utiliza preferentemente RBXM/RBXMX.
 - `fuentes/`: constructor, las mallas y texturas utilizadas, metadatos, compositor de texturas y validadores. `ASSETS_ROBLOX.json` identifica los recursos oficiales originales.
-- `Vista_frente.png` y `Vista_espalda.png`: renders del archivo de Blender entregado.
+- `Vista_frente.png`, `Vista_lateral.png`, `Vista_espalda.png` y `Vista_perspectiva.png`: renders del mismo archivo de Blender entregado. Las tres primeras son vistas ortográficas. `Tres_vistas.png` es una lámina de comparación de esos renders.
 - `Test_Pelotocino.server.lua`: prueba opcional en una experiencia nueva.
 - Los tres informes `*VERIFICACION.json`, `model_stats.json` y `SHA256SUMS.txt`: comprobaciones y huellas de archivos.
 
@@ -31,12 +31,18 @@ El cuerpo usa las **14 mallas R15 del paquete oficial gratuito Man de Roblox**, 
 - Blender vuelve a abrir la fuente con malla, 16 huesos, 15 grupos de pesos y seis texturas empaquetadas. Cada clip cambia la pose. El GLB contiene geometría, pesos, huesos, seis imágenes y tres animaciones, sin archivos externos.
 - **No se ha importado ni ejecutado dentro de Roblox Studio.** La física, la carga de los assets en tu experiencia, las animaciones y la apariencia exacta del compositor de ropa de Roblox siguen pendientes de comprobar allí. No se afirma que esté listo para producción.
 - El render de Blender emplea los mismos meshes de cuerpo y cabello. Sus atlas de ropa se recompusieron desde las plantillas oficiales; la iluminación, las costuras, la cabeza y las uniones de las piezas de la mochila pueden diferir respecto a Studio. El cuerpo se mantiene fiel al estilo de avatar, pero no se promete una copia exacta píxel por píxel de la referencia.
-- El archivo nativo contiene **542 BaseParts**: el detalle de mochila/cara todavía usa primitivas para evitar subir assets propios. La fuente tiene **22.221 vértices**. Hace falta medir rendimiento en Studio y optimizar los accesorios si habrá muchos NPC simultáneos.
+- El archivo nativo contiene **585 BaseParts**: el detalle de mochila/cara todavía usa primitivas para evitar subir assets propios. La fuente tiene **24.310 vértices**. Hace falta medir rendimiento en Studio y optimizar los accesorios si habrá muchos NPC simultáneos.
 - Las habilidades específicas de FORGOTTEN no están definidas. Se incluyen el rig y LeftGripAttachment / RightGripAttachment para integrarlas, pero faltan sus animaciones y lógica real.
 - Se entrega GLB; no se generó FBX. No se publicaron assets nuevos en Roblox ni se cambió el juego.
 
 ## Regenerar
 
-Con Blender 4.3, desde esta carpeta ejecuta `blender -b --python fuentes/build_avatar_v2.py`. El constructor usa `fuentes/avatar_assets` y escribe en esta carpeta; puedes cambiar el destino mediante `PELOTOCINO_OUT`. Para recomponer los atlas: `python fuentes/make_clothing_atlases.py` (requiere Pillow).
+Con Blender 4.3, desde esta carpeta ejecuta `blender -b --python fuentes/build_avatar_v3.py`. El constructor usa `fuentes/avatar_assets` y escribe en esta carpeta; puedes cambiar el destino mediante `PELOTOCINO_OUT`. Para recomponer los atlas: `python fuentes/make_clothing_atlases.py` (requiere Pillow).
 
 Comprobaciones: `python fuentes/validate_files.py`, `blender -b --python fuentes/verify_blender.py` y `lune run fuentes/validate_roblox.luau` (Lune 0.11.1). El último comando también genera el RBXM. Estos programas no ejecutan el motor de Studio.
+
+## Cambios de esta revisión
+
+Piernas y torso más largos, brazos más delgados, cabeza con menor anchura y profundidad, cabello ajustado y teñido de castaño más oscuro. Se conserva el gráfico original de la camiseta. Se entregan frente, lateral y espalda para comparar la silueta con la referencia. No se afirma que la semejanza sea exacta: es una revisión visual que el usuario todavía debe evaluar.
+
+Esta revisión se realizó en Blender, sin ForgeGUI. No hay una sesión de ForgeGUI conectada. No se sustituyen las pruebas de importación y animación de Studio por los renders o la validación de archivos.

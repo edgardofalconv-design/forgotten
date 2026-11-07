@@ -1,6 +1,6 @@
 {
   "animate_luau_compiles": true,
-  "baseparts": 542,
+  "baseparts": 585,
   "embedded_scripts": 1,
   "meshparts": 14,
   "motor6d": 15,
@@ -9,5 +9,5 @@
   "reader": "Lune 0.11.1 (@lune/roblox, rbx-dom)",
   "studio_execution": false,
   "test_luau_compiles": true,
-  "version": 2
+  "version": 3
 }

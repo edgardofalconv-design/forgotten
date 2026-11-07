@@ -1,15 +1,15 @@
-# Pelotocino — versión 2: avatar Roblox
+# Pelotocino — revisión 3 para evaluación
 
-[Descargar ZIP completo](./Pelotocino-3D.zip?raw=true) · [Importación y comprobaciones](./LEEME.md) · [Recursos originales](./ASSETS_ROBLOX.json)
+[Descargar ZIP completo](./Pelotocino-3D.zip?raw=true) · [Tres vistas](./Tres_vistas.png) · [Instrucciones y límites](./LEEME.md)
 
-Versión rehecha según la segunda referencia: cuerpo R15 oficial Man escalado, Pal Hair, Blue and Black Motorcycle Shirt y Black Jeans with White Shoes, con mochila básica propia. El cuerpo utiliza 14 MeshParts de Roblox; el modelo completo conserva 15 articulaciones Motor6D.
+Nueva revisión con torso y piernas más largos, brazos más delgados, cabeza más compacta de bordes redondeados y ajuste del cabello castaño. Conserva la piel blanca, chaqueta negra, camiseta azul, jeans oscuros, zapatillas blancas y mochila marrón. El cuerpo utiliza 14 MeshParts R15 oficiales y 15 articulaciones Motor6D. No se afirma una semejanza exacta: la apariencia aún debe ser evaluada por el usuario.
 
-El ZIP contiene la carpeta `Pelotocino-3D` con RBXM, RBXMX, BLEND, GLB, texturas, meshes fuente, código y verificaciones. Se incluyen también los archivos de Roblox fuera del ZIP para insertarlos directamente.
+Frente, lateral y espalda se renderizaron desde el mismo modelo de Blender. El ZIP incluye RBXM, RBXMX, BLEND, GLB, texturas, fuentes y verificaciones. La revisión se realizó en Blender; ForgeGUI no está conectado y no se utilizó.
 
-Formatos validados con Lune/rbx-dom; fuente reabierta y poses verificadas en Blender. **Pendiente probar importación, apariencia de ropa y movimiento en Roblox Studio.** El archivo nativo usa assets oficiales de la CDN de Roblox y requiere acceso a ellos. GLB/Blender incluyen geometría y texturas para edición independiente. Falta integrar las habilidades reales del juego.
+Validado con Lune/rbx-dom y Blender. **Pendiente comprobar importación, física, apariencia de ropa y movimiento dentro de Roblox Studio.** El modelo nativo requiere acceso a los assets oficiales de Roblox. Blender/GLB incorporan geometría y texturas.
 
-542 BaseParts; 22.221 vértices en la fuente. Los detalles de la mochila aún requieren medir rendimiento con múltiples NPC.
+585 BaseParts; 24.310 vértices en la fuente. Los detalles nativos de cabeza, cara y mochila todavía usan primitivas; el cuerpo usa mallas y el GLB/Blender contienen geometría de malla. Falta medir rendimiento y optimizar accesorios para producción, además de integrar las habilidades reales del juego.
 
-Entrega independiente: no se modificaron FORGOTTEN V4 ni mapas. Prueba primero en una Baseplate nueva.
+No se modificó FORGOTTEN V4 ni sus mapas. Probar primero en una Baseplate nueva.
 
-![Render de Blender del avatar versión 2](./Vista_frente.png)
+![Tres vistas del modelo de Blender, revisión 3](./Tres_vistas.png)

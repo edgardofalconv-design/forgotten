@@ -1,11 +1,11 @@
 {
-  "version": 2,
+  "version": 3,
   "body_meshparts": 14,
-  "native_primitive_details": 522,
+  "native_primitive_details": 565,
   "r15_body_parts": 15,
   "motor6d": 15,
-  "blender_vertices": 22221,
-  "blender_polygons": 30659,
+  "blender_vertices": 24310,
+  "blender_polygons": 34781,
   "native_external_meshes": 15,
   "studio_verified": false
 }

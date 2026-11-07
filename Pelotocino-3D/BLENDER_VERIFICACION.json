@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "blend_reopens": true,
-  "mesh_vertices": 22221,
+  "mesh_vertices": 24310,
   "bones": 16,
   "weighted_vertex_groups": 15,
   "packed_textures": 6,
