@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "creator": "Roblox",
+  "sources": [
+    {
+      "name": "Man body (free official bundle)",
+      "url": "https://www.roblox.com/bundles/238/Man",
+      "mesh_ids": {
+        "UpperTorso": 8650168468,
+        "LowerTorso": 8650168573,
+        "LeftUpperArm": 8650168402,
+        "LeftLowerArm": 8650168418,
+        "LeftHand": 8650168403,
+        "RightUpperArm": 8650168398,
+        "RightLowerArm": 8650168400,
+        "RightHand": 8650168401,
+        "LeftUpperLeg": 8650168539,
+        "LeftLowerLeg": 8650168545,
+        "LeftFoot": 8650168537,
+        "RightUpperLeg": 8650168571,
+        "RightLowerLeg": 8650168540,
+        "RightFoot": 8650168542
+      }
+    },
+    {
+      "name": "Pal Hair",
+      "catalog_id": 63690008,
+      "mesh_id": 83293901,
+      "texture_id": 6858317867,
+      "url": "https://www.roblox.com/catalog/63690008/Pal-Hair"
+    },
+    {
+      "name": "Blue and Black Motorcycle Shirt",
+      "catalog_id": 144076358,
+      "template_id": 144076357,
+      "url": "https://www.roblox.com/catalog/144076358/Blue-and-Black-Motorcycle-Shirt"
+    },
+    {
+      "name": "Black Jeans with White Shoes",
+      "catalog_id": 398633812,
+      "template_id": 398633811,
+      "url": "https://www.roblox.com/catalog/398633812/Black-Jeans-with-White-Shoes"
+    }
+  ],
+  "custom_geometry": "Backpack, head and smile face",
+  "notes": "Official assets remain Roblox assets; model uses their official references. Local copies support Blender editing and offline GLB. Classic clothing compositing must be checked in Studio."
+}

@@ -1,9 +1,10 @@
 {
+  "version": 2,
   "blend_reopens": true,
-  "mesh_vertices": 387226,
+  "mesh_vertices": 22221,
   "bones": 16,
   "weighted_vertex_groups": 15,
-  "packed_texture": true,
+  "packed_textures": 6,
   "animated_pose_checks": {
     "Walk": {
       "pose_changes": true,

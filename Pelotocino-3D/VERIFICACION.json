@@ -1,11 +1,14 @@
 {
+  "version": 2,
   "xml_parse": "PASS",
   "references": "PASS",
   "r15_body_parts": 15,
   "motor6d": 15,
   "joint_rest_alignment": "PASS",
   "accessories": "Hair, Backpack with Handles",
-  "parts_total": 2268,
+  "baseparts_total": 542,
+  "official_body_meshparts": 14,
+  "official_clothing": "Blue and Black Motorcycle Shirt + Black Jeans with White Shoes",
   "glb_parse": "PASS",
   "glb_skin_joints": 16,
   "glb_animations": [
@@ -13,9 +16,9 @@
     "Run",
     "Jump"
   ],
-  "glb_embedded_textures": 1,
+  "glb_embedded_textures": 6,
   "studio_import": "NOT RUN: Roblox Studio is not installed",
   "runtime_animation": "NOT RUN in Roblox Studio",
-  "visual_fidelity": "Approximation from supplied reference; chest graphic is not fully legible",
-  "performance": "Native multi-part geometry; profiling and possible mesh optimization required before production"
+  "native_dependencies": "Official Roblox meshes and clothing load through Roblox CDN; no custom asset uploads",
+  "performance": "Accessory detailing still uses native primitives; profile in Studio before production"
 }

@@ -1,11 +1,15 @@
-# Pelotocino-3D — entrega independiente para evaluación
+# Pelotocino — versión 2: avatar Roblox
 
-[Descargar ZIP completo](./Pelotocino-3D.zip?raw=true) · [Instrucciones y límites](./LEEME.md)
+[Descargar ZIP completo](./Pelotocino-3D.zip?raw=true) · [Importación y comprobaciones](./LEEME.md) · [Recursos originales](./ASSETS_ROBLOX.json)
 
-El ZIP contiene la carpeta `Pelotocino-3D` con RBXM, RBXMX, BLEND, GLB, textura, fuentes, renders y verificaciones. Se incluyen también RBXM y RBXMX fuera del ZIP para insertarlos directamente.
+Versión rehecha según la segunda referencia: cuerpo R15 oficial Man escalado, Pal Hair, Blue and Black Motorcycle Shirt y Black Jeans with White Shoes, con mochila básica propia. El cuerpo utiliza 14 MeshParts de Roblox; el modelo completo conserva 15 articulaciones Motor6D.
 
-La estructura R15 y el formato se comprobaron con rbx-dom/Lune; las animaciones de muestra cambian la pose en Blender. **No se ha probado en Roblox Studio.** Modelo para evaluación: 2.268 piezas nativas y geometría de intercambio densa; requiere optimización antes de producción. El dibujo de la camiseta es aproximado. Las habilidades específicas todavía requieren definición e integración.
+El ZIP contiene la carpeta `Pelotocino-3D` con RBXM, RBXMX, BLEND, GLB, texturas, meshes fuente, código y verificaciones. Se incluyen también los archivos de Roblox fuera del ZIP para insertarlos directamente.
 
-Probar primero en una Baseplate nueva. No se han modificado FORGOTTEN V4, mapas ni archivos anteriores del repositorio.
+Formatos validados con Lune/rbx-dom; fuente reabierta y poses verificadas en Blender. **Pendiente probar importación, apariencia de ropa y movimiento en Roblox Studio.** El archivo nativo usa assets oficiales de la CDN de Roblox y requiere acceso a ellos. GLB/Blender incluyen geometría y texturas para edición independiente. Falta integrar las habilidades reales del juego.
 
-![Modelo de Blender, vista frontal](./Vista_frente.png)
+542 BaseParts; 22.221 vértices en la fuente. Los detalles de la mochila aún requieren medir rendimiento con múltiples NPC.
+
+Entrega independiente: no se modificaron FORGOTTEN V4 ni mapas. Prueba primero en una Baseplate nueva.
+
+![Render de Blender del avatar versión 2](./Vista_frente.png)
