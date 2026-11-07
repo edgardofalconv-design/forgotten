@@ -1,0 +1,22 @@
+{
+  "blend_reopens": true,
+  "mesh_vertices": 387226,
+  "bones": 16,
+  "weighted_vertex_groups": 15,
+  "packed_texture": true,
+  "animated_pose_checks": {
+    "Walk": {
+      "pose_changes": true,
+      "matrix_delta": 0.9098
+    },
+    "Run": {
+      "pose_changes": true,
+      "matrix_delta": 1.4619
+    },
+    "Jump": {
+      "pose_changes": true,
+      "matrix_delta": 0.3842
+    }
+  },
+  "roblox_studio_execution": false
+}

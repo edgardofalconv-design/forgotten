@@ -1,0 +1,21 @@
+{
+  "xml_parse": "PASS",
+  "references": "PASS",
+  "r15_body_parts": 15,
+  "motor6d": 15,
+  "joint_rest_alignment": "PASS",
+  "accessories": "Hair, Backpack with Handles",
+  "parts_total": 2268,
+  "glb_parse": "PASS",
+  "glb_skin_joints": 16,
+  "glb_animations": [
+    "Walk",
+    "Run",
+    "Jump"
+  ],
+  "glb_embedded_textures": 1,
+  "studio_import": "NOT RUN: Roblox Studio is not installed",
+  "runtime_animation": "NOT RUN in Roblox Studio",
+  "visual_fidelity": "Approximation from supplied reference; chest graphic is not fully legible",
+  "performance": "Native multi-part geometry; profiling and possible mesh optimization required before production"
+}

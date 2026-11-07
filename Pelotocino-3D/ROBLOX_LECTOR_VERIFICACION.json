@@ -1,0 +1,11 @@
+{
+  "animate_luau_compiles": true,
+  "baseparts": 2268,
+  "embedded_scripts": 1,
+  "motor6d": 15,
+  "rbxm_binary_roundtrip": true,
+  "rbxmx_deserialized": true,
+  "reader": "Lune 0.11.1 (@lune/roblox, rbx-dom)",
+  "studio_execution": false,
+  "test_luau_compiles": true
+}
