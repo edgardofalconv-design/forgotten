@@ -1,0 +1,106 @@
+resources
+Recursos históricos conservados y contenedores válidos: {'png': 127, 'fbx': 1, 'glb': 0}
+
+rules_economy_maps_combat
+PASS: V2: reglas V1 + recoger/depositar/soltar cápsulas, LMS y bebida
+PASS: V2: seis rigs, articulaciones e identidades independientes
+PASS: economía: compras, saldos, inventario, 24 milestones y recibos repetidos
+PASS: persistencia simulada: sesión, bloqueo, guardado, liberación y fallo sin sobrescritura
+PASS: siete minijuegos: secuencias, reflejos, cuerda, interruptores y dos laberintos resolubles
+PASS: controlador objetivos: distancia, tokens, tres etapas, depósitos, abandonos y duplicados
+PASS: objetos y combate: ranuras, 7 s, cancelación, bebida 6 s, alcance, energía, escudos y cooldowns
+PASS: nueve mapas: constructores, distritos V4, geometría, objetivos, objetos y salida
+PASS: rutas 2D desde spawn a todos los objetivos, objetos y salida; piezas: disaster_island=414, pizza_place=395, forgotten_heights=658, research_facility=335, cursed_manor=728, forgotten_robloxia=403, junkbot_factory=335, corrupted_arcade=635, ballers_arena=330
+
+pelotocino_mesh_rig_equipment
+PASS: 15 segmentos, geometría sin triángulos degenerados, equipo y 8 entregas históricas presentes protegidas
+PASS: R15 conectado, 25 MeshParts, NPC idéntico, caché, equipo, raqueta y rastreador
+PASS: API de mallas denegada: aviso explícito, sin cuerpo de cubos
+
+server_five_flows
+PASS: orquestación del servidor real con dobles: practice
+PASS: orquestación del servidor real con dobles: escape
+PASS: orquestación del servidor real con dobles: lms
+PASS: orquestación del servidor real con dobles: timeout
+PASS: orquestación del servidor real con dobles: killerLeaves
+
+animation_catalog_effects
+PASS: V3: trece estados, clips, ejes R6/R15, ataque hacia delante, muerte, MVP y seis firmas de movimiento
+PASS: V3: búsqueda oficial sin IDs inventados, rechazo de impostor, caché, fallo y recuperación
+PASS: V3: estelas locales, tipos Vector3, proyectiles propios, arco y final de vuelo simulados
+
+catalog_lifecycle
+Carga, caché, fallos, R6/R15, restauración, segunda ronda y limpieza: pasan con dobles Lua. Roblox pendiente.
+
+import_fallback
+Tres casos de fallback pasan sin modificar avatar. No prueba física ni importación en Studio.
+
+place_xml
+/workspace/forgotten-pelotocino/dist/Forgotten-Pelotocino-R15.rbxlx: XML válido; 58 scripts y 1640 piezas de vista previa.
+
+standalone_exports
+/workspace/forgotten-pelotocino/dist/pelotocino/Pelotocino-R15.rbxmx
+/workspace/forgotten-pelotocino/dist/pelotocino/Pelotocino-NPC.rbxmx
+
+syntax_embedded_sources
+PASS: sintaxis adaptada: src/client/init.client.luau
+PASS: sintaxis adaptada: src/server/Abilities.luau
+PASS: sintaxis adaptada: src/server/Camp.luau
+PASS: sintaxis adaptada: src/server/MapExpansion.luau
+PASS: sintaxis adaptada: src/server/Maps.luau
+PASS: sintaxis adaptada: src/server/Objectives.luau
+PASS: sintaxis adaptada: src/server/ProfileService.luau
+PASS: sintaxis adaptada: src/server/RoundItems.luau
+PASS: sintaxis adaptada: src/server/World.luau
+PASS: sintaxis adaptada: src/server/init.server.luau
+PASS: sintaxis adaptada: src/shared/AbilityConfig.luau
+PASS: sintaxis adaptada: src/shared/AbilityTiming.luau
+PASS: sintaxis adaptada: src/shared/AnimationConfig.luau
+PASS: sintaxis adaptada: src/shared/Appearance.luau
+PASS: sintaxis adaptada: src/shared/AvatarCatalog.luau
+PASS: sintaxis adaptada: src/shared/BasicAnimation.luau
+PASS: sintaxis adaptada: src/shared/CatalogCharacter.luau
+PASS: sintaxis adaptada: src/shared/ChallengeRules.luau
+PASS: sintaxis adaptada: src/shared/CharacterFactory.luau
+PASS: sintaxis adaptada: src/shared/CharacterMotion.luau
+PASS: sintaxis adaptada: src/shared/CharacterVisualData.luau
+PASS: sintaxis adaptada: src/shared/CharacterVisuals.luau
+PASS: sintaxis adaptada: src/shared/ClientChallenge.luau
+PASS: sintaxis adaptada: src/shared/ClientEffects.luau
+PASS: sintaxis adaptada: src/shared/ClientEnvironment.luau
+PASS: sintaxis adaptada: src/shared/ClientMenus.luau
+PASS: sintaxis adaptada: src/shared/ClientMusic.luau
+PASS: sintaxis adaptada: src/shared/ClientPreview.luau
+PASS: sintaxis adaptada: src/shared/ClientResults.luau
+PASS: sintaxis adaptada: src/shared/ClientTheme.luau
+PASS: sintaxis adaptada: src/shared/Cosmetics.luau
+PASS: sintaxis adaptada: src/shared/EconomyConfig.luau
+PASS: sintaxis adaptada: src/shared/EditableAppearance.luau
+PASS: sintaxis adaptada: src/shared/FaceData.luau
+PASS: sintaxis adaptada: src/shared/FutureRoster.luau
+PASS: sintaxis adaptada: src/shared/GeneratorVisuals.luau
+PASS: sintaxis adaptada: src/shared/ImportedAppearance.luau
+PASS: sintaxis adaptada: src/shared/ItemConfig.luau
+PASS: sintaxis adaptada: src/shared/Lobby.luau
+PASS: sintaxis adaptada: src/shared/MapCatalog.luau
+PASS: sintaxis adaptada: src/shared/MaterialPack.luau
+PASS: sintaxis adaptada: src/shared/Music.luau
+PASS: sintaxis adaptada: src/shared/NativeRoundCharacter.luau
+PASS: sintaxis adaptada: src/shared/PelotocinoMeshData.luau
+PASS: sintaxis adaptada: src/shared/PelotocinoMotion.luau
+PASS: sintaxis adaptada: src/shared/PelotocinoRenderer.luau
+PASS: sintaxis adaptada: src/shared/PelotocinoRig.luau
+PASS: sintaxis adaptada: src/shared/PelotocinoSurface.luau
+PASS: sintaxis adaptada: src/shared/Portraits.luau
+PASS: sintaxis adaptada: src/shared/ProfileData.luau
+PASS: sintaxis adaptada: src/shared/RigProfileData.luau
+PASS: sintaxis adaptada: src/shared/RigProportions.luau
+PASS: sintaxis adaptada: src/shared/RoleAssignment.luau
+PASS: sintaxis adaptada: src/shared/Roster.luau
+PASS: sintaxis adaptada: src/shared/RoundRules.luau
+PASS: sintaxis adaptada: src/shared/ShopCatalog.luau
+PASS: sintaxis adaptada: src/shared/Stamina.luau
+PASS: sintaxis adaptada: src/shared/VisualGeometry.luau
+PASS: XML, jerarquía Rojo y todas las fuentes incrustadas
+
+PASS: modelos, medios y entregas protegidas. Roblox Studio no ejecutado.

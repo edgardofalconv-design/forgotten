@@ -6,6 +6,7 @@ local Catalog=require(script.Parent.CatalogCharacter)
 local AvatarCatalog=require(script.Parent.AvatarCatalog)
 local Visuals=require(script.Parent.CharacterVisuals)
 local Factory={}
+local PelotocinoRig=require(script.Parent.PelotocinoRig)
 
 function Factory.validate(model,id)
  if not model or not model:IsA("Model") then return false,"Falta Model" end
@@ -99,11 +100,12 @@ function Factory.create(entry)
  local model
  local folder=Storage:FindFirstChild("CharacterModels")
  local installed=folder and folder:FindFirstChild(entry.id)
- if installed then
+ if installed and (entry.id~="pelotocino" or installed:GetAttribute("PelotocinoR15")) then
   local valid,reason=Factory.validate(installed,entry.id)
   if valid then model=installed:Clone();model:SetAttribute("ModelStatus","Modelo instalado")
   else warn(entry.name..": "..reason..". Se conserva la plantilla y se usa un provisional.") end
  end
+ if not model and entry.id=="pelotocino" then model=PelotocinoRig.create() end
  if not model and entry.id=="junkbot" then
   model=Catalog.clone()
   if model then
@@ -152,6 +154,7 @@ function Factory.place(model,groundPosition)
  local root=model:FindFirstChild("HumanoidRootPart")
  local h=model:FindFirstChildOfClass("Humanoid")
  local offset=h.RigType==Enum.HumanoidRigType.R6 and 3.4 or (h.HipHeight+root.Size.Y/2+.4)
+ if model:GetAttribute("PelotocinoR15") then offset=h.HipHeight+root.Size.Y/2+.03 end
  model:PivotTo(CFrame.new(groundPosition+Vector3.new(0,offset,0)))
  root.AssemblyLinearVelocity=Vector3.new();root.AssemblyAngularVelocity=Vector3.new()
 end

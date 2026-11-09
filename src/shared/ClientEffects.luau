@@ -5,6 +5,7 @@ local Music=require(script.Parent.Music)
 local RunService=game:GetService("RunService")
 local Geometry=require(script.Parent.VisualGeometry)
 local VisualData=require(script.Parent.CharacterVisualData)
+local Pelotocino=require(script.Parent.PelotocinoRenderer)
 return function(enabled)
  local folder=Instance.new("Folder");folder.Name="EfectosLocalesForgotten";folder.Parent=workspace
  local function sound(key)
@@ -53,10 +54,16 @@ return function(enabled)
     local hand=data.model:FindFirstChild("RightHand") or data.model:FindFirstChild("Right Arm")
     if hand then start=hand.Position+hand.CFrame.UpVector*-.65 end
    end
+   local isPelotocino=data.projectile=="bacon" and data.model and data.model:GetAttribute("PelotocinoR15")
+   local release=isPelotocino and data.model:FindFirstChild("RightHand") and data.model.RightHand:FindFirstChild("BaconRelease")
+   if release then start=release.WorldPosition end
    local projectile=Instance.new("Model");projectile.Name="Proyectil_"..tostring(data.projectile)
    local root=Instance.new("Part");root.Name="Centro";root.Size=Vector3.new(.1,.1,.1);root.CFrame=CFrame.new();root.Transparency=1
    root.Anchored=true;root.CanCollide=false;root.CanTouch=false;root.CanQuery=false;root.Parent=projectile;projectile.PrimaryPart=root
-   if data.projectile=="cane" then
+   if isPelotocino then
+    local ok,authored=pcall(Pelotocino.projectile,folder)
+    if ok then projectile:Destroy();projectile=authored else projectile:Destroy();warn("Mechón R15: "..tostring(authored));return end
+   elseif data.projectile=="cane" then
     for _,spec in ipairs(VisualData.yellowguy) do if spec.weapon=="cane" then Geometry.build(projectile,root,spec) end end
    else
     for _,spec in ipairs(VisualData.pelotocino) do if spec.name=="Mechón Bacon 0" then Geometry.build(projectile,root,spec);break end end
@@ -109,6 +116,7 @@ return function(enabled)
   sound(data.kind=="hit" and "hit" or "skill")
  end
  local function reveal(data)
+  Pelotocino.setReveal(data)
   for _,model in ipairs(data.models or {}) do
    if typeof(model)=="Instance" and model:IsA("Model") then
     local h=Instance.new("Highlight");h.Adornee=model;h.FillColor=Color3.fromRGB(214,88,74);h.FillTransparency=.8;h.OutlineTransparency=.15

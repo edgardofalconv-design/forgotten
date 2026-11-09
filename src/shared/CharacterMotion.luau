@@ -1,6 +1,7 @@
 -- Original procedural clips, sampled identically for every observer from server time.
 -- Rotation values are radians; translation is in studs. No external AnimationIds required.
 local Motion={}
+local Pelotocino=require(script.Parent.PelotocinoMotion)
 function Motion.jointKey(name)
  local key=name:gsub(" ","")
  return key=="Root" and "RootJoint" or key
@@ -12,8 +13,8 @@ Motion.profiles={
  deathspeaker={stride=.22,pace=.75,lean=.035,bob=.08,arms=.4},
  guest666={stride=.72,pace=.85,lean=.13,bob=.025,arms=.75},
  tubers93={stride=.7,pace=.91,lean=.1,bob=.035,arms=.65}}
-Motion.durations={baconThrow=1.05,pan=.65,cane=.65,caneThrow=1.25,caneRecover=.6,punch=.5,lastFighter=1.6,
- detector=.9,luckyBacon=.9,overdrive=1.1,rocketSlam=1.25,selfRepair=2,plasma=1,shield=1.2,phantom=.7,connection=1.2,
+Motion.durations={baconThrow=1.15,pan=.72,cane=.65,caneThrow=1.25,caneRecover=.6,punch=.5,lastFighter=1.6,
+ detector=1.6,luckyBacon=.9,overdrive=1.1,rocketSlam=1.25,selfRepair=2,plasma=1,shield=1.2,phantom=.7,connection=1.2,
  claw=.6,behind=1.15,sense=1.1,sixthHour=1.5,pounce=1.2,scythe=.75,admin=1.05,hellfire=1.2,whip=.85,spin=.8,inferno=1.3,
  caneGuard=.8,grabbed=1.1,pinned=2,escape=.65}
 local function smooth(x)x=math.clamp(x,0,1);return x*x*(3-2*x)end
@@ -91,6 +92,7 @@ function Motion.toTransform(joint,v)
  return basis:Inverse()*CFrame.new(v[4] or 0,v[5] or 0,v[6] or 0)*CFrame.Angles(v[1],v[2],v[3])*basis
 end
 function Motion.sample(id,state,phase,speed,action,elapsed,context)
+ if id=="pelotocino" then return Pelotocino.sample(state,phase,speed,action,elapsed,context) end
  local p=Motion.profiles[id] or Motion.profiles.pelotocino
  context=context or {};local t=phase*p.pace
  local moving=state=="walk" or state=="run" or state=="sprint"

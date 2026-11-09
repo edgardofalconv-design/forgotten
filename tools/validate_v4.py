@@ -21,6 +21,8 @@ def protect():
     return checked
 
 def main():
+    if (ROOT/"src/shared/PelotocinoRig.luau").exists():
+        raise SystemExit("V4 protegida: usa tools/pelotocino/build.py")
     DIST.mkdir(exist_ok=True)
     protected=protect()
     tasks=[('authored_geometry',[sys.executable,'tools/build_character_visuals_v4.py']),

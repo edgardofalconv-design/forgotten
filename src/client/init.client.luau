@@ -11,6 +11,7 @@ local ItemConfig=require(shared.ItemConfig)
 local Portraits=require(shared.Portraits)
 local roster=require(shared.Roster);local byId={};for _,entry in ipairs(roster) do byId[entry.id]=entry end
 require(shared.BasicAnimation)()
+require(shared.PelotocinoRenderer).start()
 require(shared.EditableAppearance).start()
 require(shared.GeneratorVisuals).animate()
 local updateEnvironment=require(shared.ClientEnvironment).start()

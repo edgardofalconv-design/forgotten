@@ -44,7 +44,7 @@ end
 local walk=Motion.sample("pelotocino","walk",.8,16,"",100)
 assert(walk.LeftHip[1]*walk.LeftShoulder[1]<0,"same-side arm and leg move together")
 '''
-    run_lua(MOCK+module('CharacterMotion.luau','Motion')+tests,'V3: trece estados, clips, ejes R6/R15, ataque hacia delante, muerte, MVP y seis firmas de movimiento')
+    run_lua(MOCK+module('PelotocinoMotion.luau','PMotion')+'\nrequire=function(v)return v end;script={Parent={PelotocinoMotion=PMotion}}\n'+module('CharacterMotion.luau','Motion')+tests,'V3: trece estados, clips, ejes R6/R15, ataque hacia delante, muerte, MVP y seis firmas de movimiento')
 
 def catalog():
     from check_catalog_character import MOCK as BASE

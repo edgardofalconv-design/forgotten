@@ -1,2 +1,4 @@
 __pycache__/
 *.rbxlx.lock
+*.blend1
+dist/pelotocino/demo-frames/

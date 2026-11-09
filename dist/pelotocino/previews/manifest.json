@@ -1,0 +1,12 @@
+{
+  "renderer": "Blender 4.3.2",
+  "studio_executed": false,
+  "geometry_sha256": "c83992d38eb11c9df60953ea1ea2890d48519cc4f0649ad98d420fd7c46b651b",
+  "images": {
+    "05-perspectiva.png": "68a59f6f7561825993fee8afea5abc479e2c0ad67af1dce9d3af50803d26cebf",
+    "02-trasera.png": "a402dc32a71622d058d47858851ccc60eb3c3ad54c0d3cd5ca04695513214777",
+    "03-izquierda.png": "98ba35ce0676d34bc697def490cd1bbc69a1728d641423756f88c6385a21ab42",
+    "04-derecha.png": "11630d102c9d95efedc66f0663e2df3ef888b936cbc88b31e1e7b13627e1883f",
+    "01-frontal.png": "a6177254036a7016f2b0ce21e565f35e5227e9e82ff1e06735c169fc9f250282"
+  }
+}

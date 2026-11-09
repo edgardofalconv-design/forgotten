@@ -138,10 +138,10 @@ for _,entry in ipairs(roster) do
  local m=Factory.create(entry)
  local valid,reason=Factory.validate(m,entry.id)
  assert(valid,entry.id..": "..tostring(reason))
- assert(m:GetAttribute("Placeholder")==true and m:GetAttribute("CharacterIdentity")==entry.id)
+ assert(m:GetAttribute("Placeholder")== (entry.id~="pelotocino") and m:GetAttribute("CharacterIdentity")==entry.id)
  assert(m.HumanoidRootPart.Transparency==1 and not m.HumanoidRootPart.CanCollide)
  local humanoid=m:FindFirstChildOfClass("Humanoid")
- assert(humanoid.RigType=="R6" and humanoid.Health==100)
+ assert(humanoid.RigType==(entry.id=="pelotocino" and "R15" or "R6") and humanoid.Health==100)
  local parts,marks,cane,pack,robot=0,0,false,false,false
  for _,obj in ipairs(m:GetDescendants()) do
   if obj:IsA("BasePart") then assert(not obj.Anchored) end
@@ -151,19 +151,19 @@ for _,entry in ipairs(roster) do
   if obj.Name=="Cresta dorsal" then robot=true end
   if obj:IsA("Motor6D") then parts=parts+1;assert(obj.Part0 and obj.Part1) end
  end
- assert(parts==6)
- assert(marks==(entry.role=="Asesino" and 0 or 4))
+ assert(parts==(entry.id=="pelotocino" and 15 or 6))
+ assert(marks==((entry.role=="Asesino" or entry.id=="pelotocino") and 0 or 4))
  if entry.id=="yellowguy" then assert(cane and not robot and not pack) end
  if entry.id=="junkbot" then assert(robot and not cane and not pack) end
- if entry.id=="pelotocino" then assert(pack and not cane and not robot) end
+ if entry.id=="pelotocino" then assert(m:GetAttribute("PelotocinoR15") and not cane and not robot) end
 end
 -- An official Junkbot may never be installed under Yellow Guy, even with a renamed root.
 local wrong=Factory.create(roster[5]);wrong:SetAttribute("SourceBundleId",589);wrong:SetAttribute("CharacterIdentity","yellowguy")
 assert(not Factory.validate(wrong,"yellowguy"))
-local incomplete=Factory.create(roster[3]);incomplete:FindFirstChild("Torso"):Destroy()
+local incomplete=Factory.create(roster[3]);incomplete:FindFirstChild("UpperTorso"):Destroy()
 assert(not Factory.validate(incomplete,"pelotocino"))
 local disconnected=Factory.create(roster[3])
-disconnected.Torso:FindFirstChild("Left Hip").Part1=disconnected.Torso
+disconnected.LowerTorso:FindFirstChild("LeftHip").Part1=disconnected.LowerTorso
 assert(not Factory.validate(disconnected,"pelotocino"))
 '''
 

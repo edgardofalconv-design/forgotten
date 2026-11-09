@@ -77,6 +77,9 @@ Stamina.step(energy,.5,true,true);assert(energy.value==100 and energy.running)
         +module('RigProportions.luau','Proportions')+'\nscript.Parent.RigProportions=Proportions\n'
         +module('FaceData.luau','Faces')+'\nscript.Parent.FaceData=Faces\n'
         +module('CharacterVisuals.luau','Visuals')+'\nscript.Parent.CharacterVisuals=Visuals\n'
+        +'\nservices.Players={CreateHumanoidModelFromDescriptionAsync=function()error("Native API unavailable in this test")end}\n'
+        +module('PelotocinoMeshData.luau','PData')+'\nscript.Parent.PelotocinoMeshData=PData\n'
+        +module('PelotocinoRig.luau','PRig')+'\nscript.Parent.PelotocinoRig=PRig\n'
         +module('CharacterFactory.luau','Factory')+FACTORY_TESTS+module('Cosmetics.luau','Cosmetics')+r'''
 for _,entry in ipairs(roster) do for tier=0,4 do
  nodes={}
@@ -368,6 +371,30 @@ a:struggle(killer,token);a:struggle(killer,token);assert(records[killer].escape.
 advance(.15);a:struggle(killer,token);advance(.15);a:struggle(killer,token)
 assert(not records[killer].escape and a:speed(killer,16)==16)
 a:hold(p,killer,"pinned",1.6,true);advance(2);a:tick();assert(not records[killer].escape)
+-- Pelotocino R15 keeps the original server rules and exact contact boundaries.
+a=Abilities.new(context);sight=true;p.root.Position=Vector3.new(0,3,0);killer.root.Position=Vector3.new(5,3,0)
+records[p]={entry={id="pelotocino",role="Superviviente"},energy=Stamina.new(),status=true,items={}}
+records[killer]={entry={id="guest666",role="Asesino"},energy=Stamina.new(),status=true}
+records[ally]={entry={id="pelotocino",role="Superviviente"},energy=Stamina.new(),status=true}
+killer.h.Health=100;ally.h.Health=50;ally.root.Position=Vector3.new(7,3,0)
+local rays=0;a.ray=function()rays=rays+1;return killer,killer.root.Position end
+local started=time;a:cast(p,2);assert(records[p].energy.value==90 and records[p].cooldowns.baconThrow==started+18)
+a:cast(p,2);assert(records[p].energy.value==90)
+advance(.44);a:tick();assert(rays==0 and not records[killer].slowUntil)
+advance(.011);a:tick();assert(rays==1 and not records[killer].slowUntil)
+advance(.13);a:tick();assert(records[killer].slowUntil>time and a:speed(killer,18)==8 and killer.h.Health==100)
+advance(20);a.ray=function()return ally,ally.root.Position end;a:cast(p,2)
+advance(.46);a:tick();assert(ally.h.Health==50)
+advance(.2);a:tick();assert(ally.h.Health==65)
+records[killer].slowUntil=nil;records[killer].slowSpeed=nil
+started=time;a:cast(p,3);assert(records[p].cooldowns.pan==started+16)
+advance(.21);a:tick();assert(not records[killer].slowUntil)
+advance(.011);a:tick();assert(a:speed(killer,18)==6 and killer.h.Health==100)
+started=time;a:cast(p,1)
+assert(p.Character:GetAttribute("TrackerCount")==1 and p.Character:GetAttribute("TrackerUntil")==started+6)
+assert(#messages.reveal.models==1 and messages.reveal.models[1]==killer.Character)
+advance(25);killer.root.Position=Vector3.new(101,3,0);a:cast(p,1)
+assert(p.Character:GetAttribute("TrackerCount")==0 and #messages.reveal.models==0)
 items:destroy()
 '''
     run_lua(setup+server('RoundItems.luau','Items')+server('Abilities.luau','Abilities')+tests,'objetos y combate: ranuras, 7 s, cancelación, bebida 6 s, alcance, energía, escudos y cooldowns')

@@ -156,6 +156,7 @@ function Abilities:cast(player,slot,aim)
  elseif kind=="reveal" then
   local models={}
   for _,other in ipairs(self:enemies(player,ability.range,false)) do table.insert(models,other.Character) end
+  if ability.id=="detector" then player.Character:SetAttribute("TrackerCount",#models);player.Character:SetAttribute("TrackerUntil",workspace:GetServerTimeNow()+ability.duration) end
   self.c.send(player,"reveal",{models=models,duration=ability.duration})
  elseif kind=="bacon" or kind=="caneThrow" then
   local other,point=self:ray(player,direction,ability.range)

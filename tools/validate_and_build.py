@@ -1,3 +1,3 @@
-"""Current build entry point: V4, preserving V1/V2/V3 artifacts."""
-from validate_v4 import main
+"""Current Pelotocino-only build; never overwrite V1/V2/V3/V4 deliveries."""
+from pelotocino.build import main
 if __name__ == "__main__": main()

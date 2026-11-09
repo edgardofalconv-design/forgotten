@@ -1,6 +1,7 @@
 -- V3 character-specific animation state machine. Every observer samples server time.
 local Config=require(script.Parent.AnimationConfig)
 local Motion=require(script.Parent.CharacterMotion)
+local Pelotocino=require(script.Parent.PelotocinoRenderer)
 return function()
  local Collection=game:GetService("CollectionService")
  local RunService=game:GetService("RunService")
@@ -86,10 +87,11 @@ return function()
       local values=pose[name]
       if values then
        local target=Motion.toTransform(joint,values)
-       joint.Transform=joint.Transform:Lerp(target,alpha)
+       joint.Transform=(model:GetAttribute("PelotocinoR15") and key~=state) and target or joint.Transform:Lerp(target,alpha)
       end
      end
     end
+    if model:GetAttribute("PelotocinoR15") then Pelotocino.update(model,action,actionTime) end
     local away=(model:GetAttribute("CaneAwayUntil") or 0)>now
     for _,visual in ipairs(data.visuals) do
      if visual.part.Parent then

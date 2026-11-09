@@ -26,7 +26,7 @@ function Preview.show(parent,id,equipment,pose)
  if not source then caption.Text="VISTA PENDIENTE";return end
  local world=Instance.new("WorldModel");world.Parent=viewport
  local model=source:Clone();model.Parent=world
- task.defer(function()if model.Parent then require(script.Parent.EditableAppearance).apply(model) end end)
+ task.defer(function()if model.Parent then require(script.Parent.EditableAppearance).apply(model);require(script.Parent.PelotocinoRenderer).apply(model) end end)
  Cosmetics.apply(model,id,equipment)
  local root=model:FindFirstChild("HumanoidRootPart");if root then root.Anchored=true end
  local center,size=model:GetBoundingBox()
