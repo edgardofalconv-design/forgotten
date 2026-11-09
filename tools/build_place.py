@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from static_preview import populate
 ROOT = Path(__file__).resolve().parents[1]
 
-def build(target_name="Forgotten-Pelotocino-R15.rbxlx"):
+def build(target_name="Forgotten-Pelotocino-MeshParts.rbxlx"):
     tree = ET.Element('roblox', version='4')
     def item(parent, cls, name, source=None):
         node = ET.SubElement(parent, 'Item', {'class': cls})
@@ -37,7 +37,7 @@ def build(target_name="Forgotten-Pelotocino-R15.rbxlx"):
     scripts = item(starter, 'StarterPlayerScripts', 'StarterPlayerScripts')
     item(scripts, 'LocalScript', 'UI', (ROOT/'src/client/init.client.luau').read_text())
     target = ROOT/'dist'/target_name
-    assert target.name not in ['Forgotten.rbxlx','Forgotten-V2.rbxlx','Forgotten-V3.rbxlx','Forgotten-V4.rbxlx'], 'V1, V2, V3 y V4 se conservan; usa un nombre de versión nuevo.'
+    assert target.name not in ['Forgotten.rbxlx','Forgotten-V2.rbxlx','Forgotten-V3.rbxlx','Forgotten-V4.rbxlx','Forgotten-Pelotocino-R15.rbxlx'], 'Las entregas anteriores se conservan; usa un nombre de entrega nuevo.'
     target.parent.mkdir(exist_ok=True)
     ET.indent(tree)
     ET.ElementTree(tree).write(target, encoding='utf-8', xml_declaration=True)

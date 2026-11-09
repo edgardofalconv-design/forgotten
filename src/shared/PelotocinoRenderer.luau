@@ -1,79 +1,31 @@
--- Shared appearance for the playable rig, lobby NPC and preview. Actual MeshParts.
--- No visual Part/Wedge fallback: unavailable mesh APIs produce an explicit notice.
-local Assets=game:GetService("AssetService")
-local RS=game:GetService("ReplicatedStorage")
+-- Pre-imported MeshParts shared by playable character, NPC and preview.
+-- EditableMesh/EditableImage are not used by Pelotocino during play.
 local Data=require(script.Parent.PelotocinoMeshData)
-local Surface=require(script.Parent.PelotocinoSurface)
+local Library=require(script.Parent.PelotocinoMeshLibrary)
 local Motion=require(script.Parent.PelotocinoMotion)
-local Renderer={};local cache={};local inFlight={};local states=setmetatable({},{__mode="k"});local reveal
-local function vec(v)return Vector3.new(v[1],v[2],v[3])end
-local function bounds(spec)
- local lo,hi=Vector3.new(math.huge,math.huge,math.huge),Vector3.new(-math.huge,-math.huge,-math.huge)
- for _,v in ipairs(spec.vertices)do local p=vec(v);lo=Vector3.new(math.min(lo.X,p.X),math.min(lo.Y,p.Y),math.min(lo.Z,p.Z));hi=Vector3.new(math.max(hi.X,p.X),math.max(hi.Y,p.Y),math.max(hi.Z,p.Z)) end
- return (lo+hi)/2,Vector3.new(math.max(.002,hi.X-lo.X),math.max(.002,hi.Y-lo.Y),math.max(.002,hi.Z-lo.Z))
-end
-local function template(index)
- if cache[index]then return cache[index]end
- while inFlight[index]do task.wait()end
- if cache[index]then return cache[index]end
- inFlight[index]=true
- local spec=Data.meshes[index];local center,size=bounds(spec);local editable
- local ok,result=pcall(function()
-  local imported=RS:FindFirstChild("PelotocinoImportedMeshes")
-  local source=imported and imported:FindFirstChild(spec.name,true)
-  local part
-  if source and source:IsA("MeshPart")then part=source:Clone();part.Size=size
-  else
-   editable=Assets:CreateEditableMesh();assert(editable,"No hay memoria para la malla")
-   local vertices,normals,colors,uvs={},{},{},{}
-   for i,v in ipairs(spec.vertices)do
-    vertices[i]=editable:AddVertex(vec(v)-center)
-    uvs[i]=editable:AddUV(Vector2.new(.5+v[1]*.32,.5+v[2]*.32))
-    normals[i]=editable:AddNormal(vec(spec.normals[i]))
-    local c=spec.colors[i];colors[i]=editable:AddColor(Color3.fromRGB(c[1],c[2],c[3]),1)
-   end
-   for _,face in ipairs(spec.faces)do
-    local a,b,c=face[1]+1,face[2]+1,face[3]+1
-    local f=editable:AddTriangle(vertices[a],vertices[b],vertices[c]);editable:SetFaceNormals(f,{normals[a],normals[b],normals[c]});editable:SetFaceColors(f,{colors[a],colors[b],colors[c]});editable:SetFaceUVs(f,{uvs[a],uvs[b],uvs[c]})
-   end
-   part=Assets:CreateMeshPartAsync(Content.fromObject(editable),{CollisionFidelity=Enum.CollisionFidelity.Box})
-   part.Size=size;part.Color=Color3.new(1,1,1);part.Material=Enum.Material[spec.material]
-   if spec.material=="Fabric"then Surface.apply(part,spec.group=="backpack")end
-   if spec.group=="hair"or spec.group=="tuft"then Surface.applyHair(part)end
-  end
-  part.Name=spec.name;part.Anchored=false;part.CanCollide=false;part.CanTouch=false;part.CanQuery=false;part.Massless=true;part.DoubleSided=true
-  return {part=part,center=center,editable=editable}
- end)
- inFlight[index]=nil
- if not ok then if editable then editable:Destroy()end;error(result)end
- cache[index]=result;return result
-end
+local Renderer={};local states=setmetatable({},{__mode="k"});local reveal
 local function notice(model,message)
  local head=model:FindFirstChild("Head");if not head then return end
  local gui=Instance.new("BillboardGui");gui.Name="PelotocinoMeshNotice";gui.Size=UDim2.fromOffset(260,74);gui.StudsOffset=Vector3.new(0,2,0);gui.AlwaysOnTop=true;gui.Parent=head
  local text=Instance.new("TextLabel");text.Size=UDim2.fromScale(1,1);text.BackgroundColor3=Color3.fromRGB(23,28,35);text.BackgroundTransparency=.15;text.TextColor3=Color3.fromRGB(255,210,150);text.TextSize=13;text.TextWrapped=true;text.Text=message;text.Parent=gui
 end
 function Renderer.apply(model)
- if not model:GetAttribute("PelotocinoR15")or states[model]then return end
- local old=model:FindFirstChild("PelotocinoMeshAppearance");if old then old:Destroy()end
- local state={parts={},loading=true};states[model]=state
- local folder=Instance.new("Folder");folder.Name="PelotocinoMeshAppearance";folder.Parent=model;state.folder=folder
- local ok,problem=pcall(function()
-  for index,spec in ipairs(Data.meshes)do
-   local source=template(index);if not model.Parent then return end
-   local anchor=model:FindFirstChild(spec.anchor);assert(anchor,"Falta hueso R15: "..spec.anchor)
-   local part=source.part:Clone();part.CFrame=anchor.CFrame*CFrame.new(source.center);part.Parent=folder
-   local motor=Instance.new("Motor6D");motor.Name="MeshMount_"..index;motor.Part0=anchor;motor.Part1=part;motor.C0=CFrame.new(source.center);motor.Parent=part
-   table.insert(state.parts,{part=part,motor=motor,center=source.center,spec=spec})
-  end
- end)
- state.loading=false
+ if not model:GetAttribute("PelotocinoR15")then return false end
+ local previous=states[model]
+ if previous and not previous.failed then return true end
+ local ok,state=pcall(Library.attach,model)
  if not ok then
-  folder:Destroy();state.failed=true
-  model:SetAttribute("PelotocinoVisualReady",false)
-  notice(model,"PELOTOCINO · MALLAS NO DISPONIBLES\nActiva Mesh & Image APIs o instala el FBX incluido.")
-  warn("Pelotocino R15: no se reemplaza por cubos. "..tostring(problem));return
+  local problem=tostring(state)
+  if not previous or previous.problem~=problem then
+   local head=model:FindFirstChild("Head");local old=head and head:FindFirstChild("PelotocinoMeshNotice");if old then old:Destroy()end
+   notice(model,"PELOTOCINO · IMPORTACIÓN PENDIENTE\nImporta el FBX y ejecuta el instalador en modo edición.")
+   warn("Pelotocino: "..problem)
+  end
+  states[model]={failed=true,problem=problem,nextRetry=os.clock()+1}
+  model:SetAttribute("PelotocinoVisualReady",false);model:SetAttribute("PelotocinoSetupError",problem)
+  return false
  end
+ states[model]=state;model:SetAttribute("PelotocinoSetupError",nil)
  if not model.Parent then return end
  local labelHost=model.LeftHand
  local oldReadout=labelHost:FindFirstChild("TrackerReadout");if oldReadout then oldReadout:Destroy()end
@@ -83,6 +35,7 @@ function Renderer.apply(model)
  state.readout=gui;state.readoutText=text;model:SetAttribute("PelotocinoVisualReady",true)
  -- Viewport clones also start with equipment stowed, before their first animation tick.
  Renderer.update(model,"",100)
+ return true
 end
 function Renderer.setReveal(data)
  reveal={models=data.models or {},untilTime=os.clock()+math.min(data.duration or 6,10)}
@@ -91,7 +44,8 @@ local function mount(item,anchor,frame)
  item.motor.Part0=anchor;item.motor.C0=frame*CFrame.new(item.center)
 end
 function Renderer.update(model,action,elapsed)
- local state=states[model];if not state or state.loading or state.failed then return end
+ local state=states[model];if not state then return end
+ if state.failed then if os.clock()>=(state.nextRetry or 0)then Renderer.apply(model)end;return end
  local pose=Motion.equipment(action,elapsed)
  for _,item in ipairs(state.parts)do
   local spec=item.spec
@@ -137,7 +91,7 @@ end
 function Renderer.projectile(parent)
  local model=Instance.new("Model");model.Name="BaconTuftProjectile"
  for index,spec in ipairs(Data.meshes)do if spec.group=="tuft"then
-  local source=template(index);local part=source.part:Clone();part.Anchored=true;part.CFrame=CFrame.new();part.Parent=model;model.PrimaryPart=part;break
+  local source=Library.template(index);local part=source.part:Clone();part.Size=source.size;part.Transparency=0;part.CanCollide=false;part.CanTouch=false;part.CanQuery=false;part.Anchored=true;part.CFrame=CFrame.new();part.Parent=model;model.PrimaryPart=part;break
  end end
  model.Parent=parent;return model
 end

@@ -1,0 +1,3 @@
+Con el FBX importado seleccionado y Play detenido, pulsa Ctrl+9 (Windows), o Window > Script > Command Bar. Pega y ejecuta esta línea en la barra de comandos:
+
+require(game:GetService("ReplicatedStorage"):WaitForChild("PelotocinoSetup")).install()

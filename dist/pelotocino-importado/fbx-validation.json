@@ -1,0 +1,13 @@
+{
+  "studio_executed": false,
+  "renderer": "Blender 4.3.2",
+  "mesh_count": 25,
+  "fbx_round_trip_geometry_equal_within_1e_5": true,
+  "geometry_max_error": 4.76837158203125e-07,
+  "uv_and_base_color_image_checked": true,
+  "fbx_sha256": "998c13fcf3ffd6d8a37e094988b308a06019ee8d8c9f29c5d72b76b75ceebfed",
+  "images": {
+    "frontal-fbx-blender.png": "a3d4060ba470e5b42aaf07aeeb1df9d9ca4d70a1ba3a75f75e26cfbcfbeac8c5",
+    "trasera-fbx-blender.png": "a8608854df3df9883f7a296f2117f430e6a265c63c8c11208d27e1c0913c36b1"
+  }
+}

@@ -1,22 +1,14 @@
-# FORGOTTEN — Pelotocino R15
+# FORGOTTEN — Pelotocino con MeshParts importadas
 
-Entrega específica de Pelotocino sobre V4. V1–V4 y los otros cinco personajes se conservan.
+Corrección de carga sobre la entrega de Pelotocino R15. Conserva V1–V4 y la entrega anterior. No rediseña el personaje ni modifica sus animaciones, habilidades o reglas.
 
-[Descargar ZIP completo](https://github.com/edgardofalconv-design/forgotten/raw/refs/heads/character/pelotocino-r15-20261108/dist/Forgotten-Pelotocino-R15.zip) · [Descargar prueba .rbxlx](https://github.com/edgardofalconv-design/forgotten/raw/refs/heads/character/pelotocino-r15-20261108/dist/Forgotten-Pelotocino-R15.rbxlx)
+**Requiere importar un FBX una vez en Roblox Studio.** El ZIP todavía no contiene MeshIds publicados bajo tu cuenta. Después de importar y ejecutar el instalador incluido, guarda el lugar; las MeshParts quedan conectadas y visibles sin EditableMesh durante las partidas.
 
-Extrae **Forgotten-Pelotocino-R15.zip**, abre **Forgotten-Pelotocino-R15.rbxlx** en Roblox Studio y pulsa **Play → PERSONAJES → Pelotocino → JUGAR → PROBAR SOLO**.
+- [Descargar ZIP completo](https://github.com/edgardofalconv-design/forgotten/raw/refs/heads/fix/pelotocino-meshparts-20261109/dist/Forgotten-Pelotocino-MeshParts.zip).
+- [Guía exacta: importar un archivo y ejecutar una línea](docs/pelotocino-importado/IMPORTAR.md).
+- [Diagnóstico y archivos cambiados](docs/pelotocino-importado/DIAGNOSTICO.md).
+- [Vistas del FBX reimportado en Blender](docs/pelotocino-importado/VISTAS.md).
 
-Incluye cuerpo visible de mallas propias, rig R15, ropa, cabello 3D, mochila, sartén, mechón lanzable, rastreador y NPC con la misma apariencia. La animación Bacon Throw retira el mechón con la mano izquierda y lo golpea con la sartén derecha a los 0,45 s. Se mantienen los valores de habilidades de V4.
+El instalador comprueba las 25 mallas/texturas, prepara el personaje jugable y el NPC con la misma apariencia y conserva backups. Las pruebas locales incluyen fallos de importación, rig, animaciones, combate y partidas. No se ha ejecutado Roblox Studio aquí.
 
-**Requisito visual:** EditableMesh / Mesh & Image APIs disponibles, o instalación de las mallas FBX incluidas. Si la API no funciona, aparece un aviso; no se dibuja un cuerpo de cubos. Las mallas aparecen al ejecutar y todavía no son recursos definitivos publicados en Creator Store.
-
-- [Abrir, importar el NPC, controles y pruebas manuales](docs/pelotocino/ABRIR_Y_PROBAR.md).
-- [Vistas y demostración de animaciones](docs/pelotocino/VISTAS.md): Blender, no capturas de Studio.
-- `dist/pelotocino/`: modelo R15, NPC, secuencias y fuentes 3D.
-- `dist/Forgotten-Pelotocino-R15.rbxlx`: proyecto de prueba integrado.
-
-No se ejecutó Roblox Studio ni sus editores gráficos aquí. Las pruebas locales verifican reglas, estructura, mallas, animaciones y empaquetado mediante dobles de APIs; quedan pendientes física, replicación, permisos, rendimiento y revisión visual en el motor. El modelado es propio a partir de la imagen del autor; no se certifica 1:1.
-
-Desarrollo: `python3 tools/pelotocino/build.py`. No ejecutar los empaquetadores históricos sobre estas fuentes para sobrescribir entregas anteriores.
-
-El empaquetador usa las vistas y el vídeo ya generados. Para cambiar el arte, las fuentes están en `tools/pelotocino/geometry.py`, `render.py` y `demo.py`; las muestras de movimiento se exportan con `animations.py`. La validación detecta renders desactualizados. Requiere Python, NumPy, Pillow, liblua5.4 y FFmpeg; Blender solo para volver a generar las vistas.
+Construcción: `python3 tools/pelotocino_import/build.py`. Los recursos importables están en `dist/pelotocino-importado/fuentes-3d/`. El FBX reutiliza la geometría existente y agrega UV/texturas exportables. No se inventaron AssetIds.

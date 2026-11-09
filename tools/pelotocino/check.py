@@ -75,6 +75,9 @@ require=function(v)return v end;script={Parent={}}
 '''
 
 def rig_and_renderer():
+ if (ROOT/'src/shared/PelotocinoMeshLibrary.luau').exists():
+  from pelotocino_import.check import renderer,installer
+  renderer();installer();return
  setup=MOCK+FACTORY_MOCK+SETUP
  for file,var in [('PelotocinoMeshData','Data'),('PelotocinoMotion','Motion'),('PelotocinoRig','Rig')]:
   setup+=module(file+'.luau',var)+'\nscript.Parent.'+file+'='+var+'\n'

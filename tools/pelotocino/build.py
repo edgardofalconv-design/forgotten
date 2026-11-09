@@ -109,6 +109,8 @@ def check_preserved_sources():
     return checked
 
 def main():
+    if (ROOT/'src/shared/PelotocinoMeshLibrary.luau').exists():
+        raise SystemExit('Entrega anterior protegida. Usa tools/pelotocino_import/build.py.')
     protected=art();preserved=check_preserved_sources(); logs=[]
     for p in (ROOT/'tools').rglob('*.py'):compile(p.read_text(),str(p),'exec')
     tasks=[

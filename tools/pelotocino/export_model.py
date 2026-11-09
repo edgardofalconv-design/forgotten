@@ -76,5 +76,6 @@ def model_export(npc):
  out=OUT/('Pelotocino-NPC.rbxmx'if npc else'Pelotocino-R15.rbxmx');E.indent(root);E.ElementTree(root).write(out,encoding='utf-8',xml_declaration=True)
  return out
 if __name__=='__main__':
+ if (ROOT/'src/shared/PelotocinoMeshLibrary.luau').exists():raise SystemExit('Entrega anterior protegida: usa tools/pelotocino_import/export.py')
  for npc in [False,True]:print(model_export(npc))
  root=E.Element('roblox',version='4');sequences(root);E.indent(root);E.ElementTree(root).write(OUT/'Pelotocino-Animations.rbxmx',encoding='utf-8',xml_declaration=True)

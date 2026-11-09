@@ -1,0 +1,494 @@
+{
+  "source_geometry_sha256": "c83992d38eb11c9df60953ea1ea2890d48519cc4f0649ad98d420fd7c46b651b",
+  "geometry_changed": false,
+  "studio_executed": false,
+  "uploaded_asset_ids": false,
+  "atlas_size": 2048,
+  "cell": 12,
+  "columns": 170,
+  "triangles": 17496,
+  "meshes": [
+    {
+      "name": "UpperTorso_body_Fabric",
+      "anchor": "UpperTorso",
+      "group": "body",
+      "material": "Fabric",
+      "center": [
+        0.0,
+        -0.05249999999999999,
+        0.027725
+      ],
+      "size": [
+        1.63982,
+        1.365,
+        0.90039
+      ],
+      "vertices": 538,
+      "triangles": 1032,
+      "first_face": 0
+    },
+    {
+      "name": "UpperTorso_body_SmoothPlastic",
+      "anchor": "UpperTorso",
+      "group": "body",
+      "material": "SmoothPlastic",
+      "center": [
+        0.0,
+        0.65,
+        0.0
+      ],
+      "size": [
+        0.43,
+        0.35996000000000006,
+        0.45
+      ],
+      "vertices": 260,
+      "triangles": 516,
+      "first_face": 1032
+    },
+    {
+      "name": "LowerTorso_body_Fabric",
+      "anchor": "LowerTorso",
+      "group": "body",
+      "material": "Fabric",
+      "center": [
+        0.0,
+        0.01999999999999999,
+        0.0
+      ],
+      "size": [
+        1.14,
+        0.6000000000000001,
+        0.66
+      ],
+      "vertices": 72,
+      "triangles": 140,
+      "first_face": 1548
+    },
+    {
+      "name": "Head_body_SmoothPlastic",
+      "anchor": "Head",
+      "group": "body",
+      "material": "SmoothPlastic",
+      "center": [
+        0.0,
+        -0.0050000000000000044,
+        -0.013795000000000002
+      ],
+      "size": [
+        1.3,
+        1.17,
+        1.08759
+      ],
+      "vertices": 666,
+      "triangles": 1316,
+      "first_face": 1688
+    },
+    {
+      "name": "LeftUpperArm_body_Fabric",
+      "anchor": "LeftUpperArm",
+      "group": "body",
+      "material": "Fabric",
+      "center": [
+        0.0,
+        -0.004999999999999977,
+        0.0
+      ],
+      "size": [
+        0.64,
+        0.9299999999999999,
+        0.64
+      ],
+      "vertices": 192,
+      "triangles": 376,
+      "first_face": 3004
+    },
+    {
+      "name": "LeftLowerArm_body_SmoothPlastic",
+      "anchor": "LeftLowerArm",
+      "group": "body",
+      "material": "SmoothPlastic",
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size": [
+        0.54,
+        0.66,
+        0.54
+      ],
+      "vertices": 96,
+      "triangles": 188,
+      "first_face": 3380
+    },
+    {
+      "name": "LeftHand_body_SmoothPlastic",
+      "anchor": "LeftHand",
+      "group": "body",
+      "material": "SmoothPlastic",
+      "center": [
+        -0.032500000000000015,
+        -0.019185000000000008,
+        0.0050000000000000044
+      ],
+      "size": [
+        0.495,
+        0.60833,
+        0.39
+      ],
+      "vertices": 536,
+      "triangles": 1064,
+      "first_face": 3568
+    },
+    {
+      "name": "LeftUpperLeg_body_Fabric",
+      "anchor": "LeftUpperLeg",
+      "group": "body",
+      "material": "Fabric",
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size": [
+        0.68,
+        0.96,
+        0.7
+      ],
+      "vertices": 200,
+      "triangles": 344,
+      "first_face": 4632
+    },
+    {
+      "name": "LeftLowerLeg_body_Fabric",
+      "anchor": "LeftLowerLeg",
+      "group": "body",
+      "material": "Fabric",
+      "center": [
+        -0.0039849999999999886,
+        -0.0050000000000000044,
+        0.0
+      ],
+      "size": [
+        0.6279699999999999,
+        0.97,
+        0.68
+      ],
+      "vertices": 200,
+      "triangles": 344,
+      "first_face": 4976
+    },
+    {
+      "name": "LeftFoot_body_SmoothPlastic",
+      "anchor": "LeftFoot",
+      "group": "body",
+      "material": "SmoothPlastic",
+      "center": [
+        0.0,
+        -0.0050000000000000044,
+        -0.04397999999999999
+      ],
+      "size": [
+        0.68,
+        0.45,
+        1.01796
+      ],
+      "vertices": 404,
+      "triangles": 748,
+      "first_face": 5320
+    },
+    {
+      "name": "RightUpperArm_body_Fabric",
+      "anchor": "RightUpperArm",
+      "group": "body",
+      "material": "Fabric",
+      "center": [
+        0.0,
+        -0.004999999999999977,
+        0.0
+      ],
+      "size": [
+        0.64,
+        0.9299999999999999,
+        0.64
+      ],
+      "vertices": 192,
+      "triangles": 376,
+      "first_face": 6068
+    },
+    {
+      "name": "RightLowerArm_body_SmoothPlastic",
+      "anchor": "RightLowerArm",
+      "group": "body",
+      "material": "SmoothPlastic",
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size": [
+        0.54,
+        0.66,
+        0.54
+      ],
+      "vertices": 96,
+      "triangles": 188,
+      "first_face": 6444
+    },
+    {
+      "name": "RightHand_body_SmoothPlastic",
+      "anchor": "RightHand",
+      "group": "body",
+      "material": "SmoothPlastic",
+      "center": [
+        0.032500000000000015,
+        -0.019185000000000008,
+        0.0050000000000000044
+      ],
+      "size": [
+        0.495,
+        0.60833,
+        0.39
+      ],
+      "vertices": 536,
+      "triangles": 1064,
+      "first_face": 6632
+    },
+    {
+      "name": "RightUpperLeg_body_Fabric",
+      "anchor": "RightUpperLeg",
+      "group": "body",
+      "material": "Fabric",
+      "center": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "size": [
+        0.68,
+        0.96,
+        0.7
+      ],
+      "vertices": 200,
+      "triangles": 344,
+      "first_face": 7696
+    },
+    {
+      "name": "RightLowerLeg_body_Fabric",
+      "anchor": "RightLowerLeg",
+      "group": "body",
+      "material": "Fabric",
+      "center": [
+        0.0039849999999999886,
+        -0.0050000000000000044,
+        0.0
+      ],
+      "size": [
+        0.6279699999999999,
+        0.97,
+        0.68
+      ],
+      "vertices": 200,
+      "triangles": 344,
+      "first_face": 8040
+    },
+    {
+      "name": "RightFoot_body_SmoothPlastic",
+      "anchor": "RightFoot",
+      "group": "body",
+      "material": "SmoothPlastic",
+      "center": [
+        0.0,
+        -0.0050000000000000044,
+        -0.04397999999999999
+      ],
+      "size": [
+        0.68,
+        0.45,
+        1.01796
+      ],
+      "vertices": 404,
+      "triangles": 748,
+      "first_face": 8384
+    },
+    {
+      "name": "UpperTorso_backpack_Fabric",
+      "anchor": "UpperTorso",
+      "group": "backpack",
+      "material": "Fabric",
+      "center": [
+        0.0,
+        0.09589999999999999,
+        0.32600500000000004
+      ],
+      "size": [
+        1.34,
+        1.4318,
+        1.62195
+      ],
+      "vertices": 1056,
+      "triangles": 1984,
+      "first_face": 9132
+    },
+    {
+      "name": "UpperTorso_backpack_Metal",
+      "anchor": "UpperTorso",
+      "group": "backpack",
+      "material": "Metal",
+      "center": [
+        -0.002224999999999977,
+        0.05357,
+        0.32126499999999997
+      ],
+      "size": [
+        1.15355,
+        0.32914,
+        1.66053
+      ],
+      "vertices": 200,
+      "triangles": 376,
+      "first_face": 11116
+    },
+    {
+      "name": "Head_hair_SmoothPlastic",
+      "anchor": "Head",
+      "group": "hair",
+      "material": "SmoothPlastic",
+      "center": [
+        0.0,
+        0.35733499999999996,
+        0.029779999999999973
+      ],
+      "size": [
+        1.60976,
+        1.08809,
+        1.26852
+      ],
+      "vertices": 1622,
+      "triangles": 3092,
+      "first_face": 11492
+    },
+    {
+      "name": "Head_tuft_SmoothPlastic",
+      "anchor": "Head",
+      "group": "tuft",
+      "material": "SmoothPlastic",
+      "center": [
+        0.027895000000000003,
+        0.6504300000000001,
+        -0.09757500000000002
+      ],
+      "size": [
+        0.31265,
+        0.5706600000000001,
+        0.99467
+      ],
+      "vertices": 132,
+      "triangles": 252,
+      "first_face": 14584
+    },
+    {
+      "name": "RightHand_pan_Metal",
+      "anchor": "RightHand",
+      "group": "pan",
+      "material": "Metal",
+      "center": [
+        0.0,
+        -0.74,
+        -0.075
+      ],
+      "size": [
+        1.0,
+        1.0,
+        0.15
+      ],
+      "vertices": 592,
+      "triangles": 1096,
+      "first_face": 14836
+    },
+    {
+      "name": "RightHand_pan_SmoothPlastic",
+      "anchor": "RightHand",
+      "group": "pan",
+      "material": "SmoothPlastic",
+      "center": [
+        0.0,
+        -0.1,
+        0.0
+      ],
+      "size": [
+        0.17,
+        0.44,
+        0.17
+      ],
+      "vertices": 36,
+      "triangles": 68,
+      "first_face": 15932
+    },
+    {
+      "name": "LeftHand_tracker_Metal",
+      "anchor": "LeftHand",
+      "group": "tracker",
+      "material": "Metal",
+      "center": [
+        0.0,
+        0.11500000000000002,
+        -0.07999999999999999
+      ],
+      "size": [
+        0.44,
+        0.8700000000000001,
+        0.19
+      ],
+      "vertices": 160,
+      "triangles": 312,
+      "first_face": 16000
+    },
+    {
+      "name": "LeftHand_tracker_SmoothPlastic",
+      "anchor": "LeftHand",
+      "group": "tracker",
+      "material": "SmoothPlastic",
+      "center": [
+        0.0,
+        0.021250000000000005,
+        -0.19174999999999998
+      ],
+      "size": [
+        0.34,
+        0.4675,
+        0.035500000000000004
+      ],
+      "vertices": 456,
+      "triangles": 900,
+      "first_face": 16312
+    },
+    {
+      "name": "LeftHand_tracker_Neon",
+      "anchor": "LeftHand",
+      "group": "tracker",
+      "material": "Neon",
+      "center": [
+        0.0,
+        0.1,
+        -0.214
+      ],
+      "size": [
+        0.28,
+        0.24,
+        0.014000000000000012
+      ],
+      "vertices": 144,
+      "triangles": 284,
+      "first_face": 17212
+    }
+  ],
+  "textures": {
+    "Pelotocino-Metalness.png": "f51d537b14bcf04f960d3ee3bcb3b3c6b93d72e673ed2ba368be69e295f627cb",
+    "Pelotocino-Roughness.png": "e319f7e38d659926d9f7c3b1aac8397bc67af3c39d7dafa5a516cb1464d68d0d",
+    "Pelotocino-Color.png": "4ffa215f0b42a884844c78c900eb8eff691b86a85326694c05514577694f43e6"
+  },
+  "fbx_sha256": "998c13fcf3ffd6d8a37e094988b308a06019ee8d8c9f29c5d72b76b75ceebfed",
+  "blend_sha256": "b3a161c2d305da65c9b3ed7d39c90cb6fb640a4b3d04c4918c9ba10af3b6a312"
+}

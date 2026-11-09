@@ -63,6 +63,7 @@ function Preview.show(parent,id,equipment,pose)
    if v then joint.Transform=Motion.toTransform(joint,v) end
   end
   end
+  if model:GetAttribute("PelotocinoR15")then require(script.Parent.PelotocinoRenderer).update(model,"",100)end
  end)
  viewport.Destroying:Connect(function()connection:Disconnect()end)
 end
