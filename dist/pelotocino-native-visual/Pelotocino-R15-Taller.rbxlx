@@ -1,0 +1,501 @@
+<?xml version='1.0' encoding='utf-8'?>
+<roblox version="4">
+  <Item class="Workspace" referent="RBX_NATIVE_1">
+    <Properties>
+      <string name="Name">Workspace</string>
+      <bool name="StreamingEnabled">false</bool>
+    </Properties>
+    <Item class="Part" referent="RBX_NATIVE_2">
+      <Properties>
+        <string name="Name">Suelo_Taller</string>
+        <Vector3 name="size">
+          <X>30</X>
+          <Y>1</Y>
+          <Z>20</Z>
+        </Vector3>
+        <CoordinateFrame name="CFrame">
+          <X>0</X>
+          <Y>-0.5</Y>
+          <Z>0</Z>
+          <R00>1</R00>
+          <R01>0</R01>
+          <R02>0</R02>
+          <R10>0</R10>
+          <R11>1</R11>
+          <R12>0</R12>
+          <R20>0</R20>
+          <R21>0</R21>
+          <R22>1</R22>
+        </CoordinateFrame>
+        <bool name="Anchored">true</bool>
+        <bool name="Locked">true</bool>
+        <Color3 name="Color">
+          <R>0.13</R>
+          <G>0.15</G>
+          <B>0.18</B>
+        </Color3>
+      </Properties>
+    </Item>
+  </Item>
+  <Item class="Lighting" referent="RBX_NATIVE_3">
+    <Properties>
+      <string name="Name">Lighting</string>
+      <float name="Brightness">2</float>
+      <float name="ClockTime">12</float>
+    </Properties>
+  </Item>
+  <Item class="ReplicatedStorage" referent="RBX_NATIVE_4">
+    <Properties>
+      <string name="Name">ReplicatedStorage</string>
+    </Properties>
+    <Item class="Folder" referent="RBX_NATIVE_5">
+      <Properties>
+        <string name="Name">PelotocinoVisualWorkshop</string>
+      </Properties>
+      <Item class="ModuleScript" referent="RBX_NATIVE_6">
+        <Properties>
+          <string name="Name">Config</string>
+          <ProtectedString name="Source">-- Visual prototype only. No gameplay constants or animation IDs belong here.
+return {
+	Version = "native-visual-20261110",
+	-- IDs stay unset until verified in Studio. These are catalog item names,
+	-- not mesh or texture IDs. The resolver requires Roblox (user ID 1).
+	Resources = {
+		Hair = {Name = "Pal Hair", Type = "HairAccessory", AssetTypeId = 41, Id = 0},
+		Shirt = {Name = "Blue and Black Motorcycle Shirt", Type = "Shirt", AssetTypeId = 11, Id = 0},
+		Pants = {Name = "Dark Green Jeans", Type = "Pants", AssetTypeId = 12, Id = 0},
+	},
+	-- Starting proportions for the selected native mesh body; review in Studio.
+	Scale = {WidthScale = 0.80, DepthScale = 0.85, HeightScale = 1.00, HeadScale = 1.00},
+	Skin = Color3.fromRGB(242, 243, 243),
+	-- Accessory-only geometry from the previous work, in Roblox studs.
+	SourceTorsoSize = Vector3.new(1.25, 1.10, 0.68),
+	BackpackFit = Vector3.new(1, 1, 1),
+	BackpackOffset = Vector3.new(0, 0, 0),
+}
+</ProtectedString>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="RBX_NATIVE_7">
+        <Properties>
+          <string name="Name">Catalog</string>
+          <ProtectedString name="Source">-- Called in edit mode only. Never fabricates IDs or substitutes geometry.
+local Config = require(script.Parent.Config)
+local Catalog = {}
+
+function Catalog.validate(info, spec)
+	local creator = info.Creator or {}
+	local creatorId = tonumber(creator.CreatorTargetId or creator.Id)
+	assert(creatorId == 1 and creator.CreatorType == "User", "El recurso no pertenece al usuario oficial Roblox.")
+	assert(info.Name == spec.Name, "Nombre incorrecto: se esperaba «" .. spec.Name .. "».")
+	assert(tonumber(info.AssetTypeId) == spec.AssetTypeId, "Tipo de recurso incorrecto para «" .. spec.Name .. "».")
+	return true
+end
+
+local function verify(id, spec)
+	assert(type(id) == "number" and id &gt; 0 and id % 1 == 0, "ID de catálogo inválido.")
+	local info = game:GetService("MarketplaceService"):GetProductInfoAsync(id, Enum.InfoType.Asset)
+	Catalog.validate(info, spec)
+	return id
+end
+
+function Catalog.resolveOne(spec)
+	if spec.Id and spec.Id &gt; 0 then return verify(spec.Id, spec) end
+	local params = CatalogSearchParams.new()
+	params.SearchKeyword = spec.Name
+	params.CreatorId = 1
+	params.CreatorType = Enum.CreatorTypeFilter.User
+	params.AssetTypes = {Enum.AvatarAssetType[spec.Type]}
+	params.IncludeOffSale = true
+	params.Limit = 30
+	local pages = game:GetService("AvatarEditorService"):SearchCatalogAsync(params)
+	local matches = {}
+	for _ = 1, 5 do
+		for _, item in ipairs(pages:GetCurrentPage()) do
+			if item.Name == spec.Name then
+				local id = tonumber(item.Id)
+				local ok = pcall(verify, id, spec)
+				if ok then matches[id] = true end
+			end
+		end
+		if pages.IsFinished then break end
+		pages:AdvanceToNextPageAsync()
+	end
+	local found
+	for id in pairs(matches) do
+		assert(not found, "Hay varios recursos oficiales con ese nombre. Especifica el ID que elegiste en Config.Resources.")
+		found = id
+	end
+	assert(found, "No se pudo verificar «" .. spec.Name .. "». Abre su página oficial, copia el ID de /catalog/ y escríbelo en Config.Resources; consulta LEEME.")
+	return found
+end
+
+function Catalog.resolve()
+	local result = {}
+	for _, key in ipairs({"Hair", "Shirt", "Pants"}) do
+		local ok, value = pcall(Catalog.resolveOne, Config.Resources[key])
+		assert(ok, key .. ": " .. tostring(value))
+		result[key] = value
+	end
+	return result
+end
+
+return Catalog
+</ProtectedString>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="RBX_NATIVE_8">
+        <Properties>
+          <string name="Name">Workshop</string>
+          <ProtectedString name="Source">-- EDIT-MODE VISUAL WORKSHOP. Does not modify FORGOTTEN or create a body.
+local Config = require(script.Parent.Config)
+local Catalog = require(script.Parent.Catalog)
+local Workshop = {}
+local BODY = {"Head", "UpperTorso", "LowerTorso", "LeftUpperArm", "LeftLowerArm", "LeftHand",
+	"RightUpperArm", "RightLowerArm", "RightHand", "LeftUpperLeg", "LeftLowerLeg", "LeftFoot",
+	"RightUpperLeg", "RightLowerLeg", "RightFoot"}
+
+local function editOnly()
+	local run = game:GetService("RunService")
+	assert(run:IsStudio() and not run:IsRunning(), "Detén Play. Ejecuta este taller desde la barra de comandos en edición.")
+end
+
+local function meshIdentity(part)
+	if part:IsA("MeshPart") then
+		assert(part.MeshId ~= "", "MeshPart sin recurso: " .. part.Name)
+		return "MeshPart:" .. part.MeshId
+	end
+	local mesh = part:FindFirstChildOfClass("SpecialMesh")
+	assert(part.Name == "Head" and mesh, "Elige un R15 con cuerpo de malla en Rig Generator; no un rig Block ni el cuerpo anterior.")
+	return "Head:" .. tostring(mesh.MeshType) .. ":" .. mesh.MeshId
+end
+
+function Workshop.validateRig(rig)
+	assert(rig and rig:IsA("Model"), "Selecciona el Model Rig creado con Avatar &gt; Character (Rig Generator).")
+	assert(not rig:GetAttribute("PelotocinoR15") and not rig:FindFirstChild("PelotocinoMeshAppearance"),
+		"Este es el cuerpo de la entrega anterior. Inserta un R15 nuevo con Rig Generator.")
+	local humanoid = rig:FindFirstChildOfClass("Humanoid")
+	assert(humanoid and humanoid.RigType == Enum.HumanoidRigType.R15, "Se necesita un rig R15 auténtico.")
+	local root = rig:FindFirstChild("HumanoidRootPart")
+	assert(root and root:IsA("BasePart"), "Falta HumanoidRootPart.")
+	local identities, bodies = {}, {[root] = true}
+	for _, name in ipairs(BODY) do
+		local part = rig:FindFirstChild(name)
+		assert(part and part:IsA("BasePart"), "Falta la parte R15 " .. name)
+		identities[name] = meshIdentity(part)
+		bodies[part] = true
+	end
+	-- Require a connected 16-part native joint graph, not just joint names.
+	local reached = {[root] = true}
+	for _ = 1, 16 do
+		for _, joint in ipairs(rig:GetDescendants()) do
+			if joint:IsA("Motor6D") and bodies[joint.Part0] and bodies[joint.Part1] then
+				if reached[joint.Part0] then reached[joint.Part1] = true end
+				if reached[joint.Part1] then reached[joint.Part0] = true end
+			end
+		end
+	end
+	for part in pairs(bodies) do assert(reached[part], "Articulación desconectada: " .. part.Name) end
+	assert(rig.UpperTorso:FindFirstChild("BodyBackAttachment"), "El R15 necesita BodyBackAttachment original.")
+	return humanoid, identities
+end
+
+local function stripScripts(model)
+	for _, node in ipairs(model:GetDescendants()) do
+		if node:IsA("LuaSourceContainer") then node:Destroy() end
+	end
+end
+
+local function texturesLoaded(instances)
+	local failures = {}
+	game:GetService("ContentProvider"):PreloadAsync(instances, function(id, status)
+		if status ~= Enum.AssetFetchStatus.Success then table.insert(failures, tostring(id)) end
+	end)
+	assert(#failures == 0, "Roblox no pudo cargar estos recursos: " .. table.concat(failures, ", ") .. ". Revisa permisos del propietario y Output.")
+end
+
+local function findMeshes(model)
+	assert(model and model:IsA("Model"), "Importa Accesorios-Pelotocino.fbx y selecciona su modelo junto al Rig (Ctrl+clic).")
+	local found = {}
+	for _, node in ipairs(model:GetDescendants()) do
+		if node:IsA("MeshPart") then
+			local name = node.Name
+			assert(name == "Backpack" or name == "Pan" or name == "Tracker", "Malla inesperada: " .. name .. ". Usa el FBX de accesorios de este prototipo.")
+			assert(not found[name], "Malla duplicada: " .. name)
+			assert(node.MeshId ~= "" and node.Transparency &lt; 1, "Malla sin importar: " .. name)
+			local surface = node:FindFirstChildOfClass("SurfaceAppearance")
+			assert(node.TextureID ~= "" or (surface and surface.ColorMap ~= ""), "Falta la textura Color de " .. name)
+			found[name] = node
+		end
+	end
+	for _, name in ipairs({"Backpack", "Pan", "Tracker"}) do assert(found[name], "Falta la malla " .. name .. ". Desactiva Merge Meshes al importar.") end
+	return found
+end
+
+local function inert(mesh)
+	stripScripts(mesh)
+	for _, node in ipairs(mesh:GetDescendants()) do
+		if node:IsA("JointInstance") or node:IsA("WeldConstraint") or node:IsA("Attachment") then node:Destroy() end
+	end
+	mesh.Anchored = false
+	mesh.CanCollide = false
+	mesh.CanTouch = false
+	mesh.Massless = true
+	mesh.Transparency = 0
+	mesh.Color = Color3.new(1, 1, 1)
+	return mesh
+end
+
+local function backpack(rig, template)
+	local accessory = Instance.new("Accessory")
+	accessory.Name = "Pelotocino_Backpack"
+	accessory.AccessoryType = Enum.AccessoryType.Back
+	local handle = inert(template:Clone())
+	handle.Name = "Handle"
+	local torso = rig.UpperTorso
+	local scale = Vector3.new(torso.Size.X / Config.SourceTorsoSize.X, torso.Size.Y / Config.SourceTorsoSize.Y,
+		torso.Size.Z / Config.SourceTorsoSize.Z) * Config.BackpackFit
+	handle.Size = Vector3.new(1.34, 1.4318, 1.66053) * scale
+	-- The FBX origin is its bounds center; its source frame is UpperTorso.
+	local center = Vector3.new(0, 0.0959, 0.321265) * scale + Config.BackpackOffset
+	local localHandle = CFrame.new(center)
+	handle.CFrame = torso.CFrame * localHandle
+	handle.Parent = accessory
+	local attachment = Instance.new("Attachment")
+	attachment.Name = "BodyBackAttachment"
+	attachment.CFrame = localHandle:Inverse() * torso.BodyBackAttachment.CFrame
+	attachment.Parent = handle
+	rig:FindFirstChildOfClass("Humanoid"):AddAccessory(accessory)
+	assert(handle:FindFirstChild("AccessoryWeld"), "Roblox no pudo fijar la mochila al R15.")
+	return accessory
+end
+
+local function appearanceSignature(rig)
+	-- Stable fingerprint for visible components, clothing and accessory placement.
+	local rows = {}
+	local function path(node)
+		local names = {}
+		while node ~= rig do table.insert(names, 1, node.Name); node = node.Parent end
+		return table.concat(names, "/")
+	end
+	for _, n in ipairs(rig:GetDescendants()) do
+		local values = {path(n), n.ClassName}
+		if n:IsA("BasePart") then
+			table.insert(values, tostring(n.Size)); table.insert(values, tostring(n.Color))
+			table.insert(values, tostring(n.Transparency)); table.insert(values, tostring(n.Material))
+			if n:IsA("MeshPart") then table.insert(values, n.MeshId); table.insert(values, n.TextureID) end
+		elseif n:IsA("SpecialMesh") then
+			table.insert(values, n.MeshId); table.insert(values, n.TextureId); table.insert(values, tostring(n.Scale))
+		elseif n:IsA("Shirt") then table.insert(values, n.ShirtTemplate)
+		elseif n:IsA("Pants") then table.insert(values, n.PantsTemplate)
+		elseif n:IsA("Decal") then table.insert(values, n.Texture)
+		elseif n:IsA("Attachment") then table.insert(values, tostring(n.CFrame))
+		elseif n:IsA("JointInstance") then
+			table.insert(values, tostring(n.C0)); table.insert(values, tostring(n.C1))
+		elseif n:IsA("SurfaceAppearance") then
+			for _, key in ipairs({"ColorMap", "NormalMap", "RoughnessMap", "MetalnessMap"}) do table.insert(values, n[key]) end
+		end
+		table.insert(rows, table.concat(values, "|"))
+	end
+	table.sort(rows)
+	return table.concat(rows, "\n")
+end
+
+function Workshop.assertSameAppearance(a, b)
+	assert(appearanceSignature(a) == appearanceSignature(b), "Las dos copias visuales tienen recursos o ajustes diferentes.")
+	return true
+end
+
+function Workshop.install(rig, imported)
+	editOnly()
+	if not rig then
+		for _, selected in ipairs(game:GetService("Selection"):Get()) do
+			if selected:IsA("Model") and selected:FindFirstChildOfClass("Humanoid") then
+				assert(not rig, "Selecciona solo un Rig y el modelo FBX de accesorios."); rig = selected
+			elseif selected:IsA("Model") then
+				assert(not imported, "Selecciona solo un Rig y el modelo FBX de accesorios."); imported = selected
+			end
+		end
+	end
+	local _, original = Workshop.validateRig(rig)
+	assert(rig.Archivable, "Activa Archivable en el Rig original.")
+	local meshes = findMeshes(imported)
+	texturesLoaded({imported})
+	local ids = Catalog.resolve()
+	local stage = Instance.new("Folder")
+	stage.Name = "PelotocinoVisual_" .. os.date("!%Y%m%d_%H%M%S")
+	assert(not workspace:FindFirstChild(stage.Name), "Espera un segundo antes de crear otra revisión.")
+	stage:SetAttribute("AppearanceApproved", false)
+	stage:SetAttribute("Version", Config.Version)
+	stage.Parent = workspace
+	local ok, err = pcall(function()
+		local avatar = rig:Clone()
+		avatar.Name = "Pelotocino_Visual"
+		stripScripts(avatar)
+		avatar.Parent = stage
+		local h = avatar:FindFirstChildOfClass("Humanoid")
+		local description = h:GetAppliedDescription()
+		-- Body asset IDs / body package stay exactly as provided by Rig Generator.
+		description:SetAccessories({}, true)
+		description.HairAccessory = tostring(ids.Hair)
+		description.Shirt = ids.Shirt
+		description.Pants = ids.Pants
+		description.GraphicTShirt = 0
+		description.Face = 0 -- native Roblox classic smile, no fabricated catalog ID
+		for key, value in pairs(Config.Scale) do description[key] = value end
+		for _, key in ipairs({"HeadColor", "TorsoColor", "LeftArmColor", "RightArmColor", "LeftLegColor", "RightLegColor"}) do description[key] = Config.Skin end
+		-- Older Studio builds may not expose UseAvatarSettings yet.
+		pcall(function() description.UseAvatarSettings = false end)
+		h:ApplyDescriptionAsync(description, Enum.AssetTypeVerification.Always)
+		description:Destroy()
+		local _, current = Workshop.validateRig(avatar)
+		for name, identity in pairs(original) do
+			assert(identity == current[name], "La aplicación cambió el cuerpo nativo (" .. name .. "). Usa un Rig Generator recién insertado; no se acepta reemplazarlo.")
+		end
+		assert(avatar:FindFirstChildOfClass("Shirt") and avatar:FindFirstChildOfClass("Pants"), "La ropa oficial no se cargó.")
+		local hair
+		for _, item in ipairs(avatar:GetChildren()) do
+			if item:IsA("Accessory") and item.AccessoryType == Enum.AccessoryType.Hair then hair = item end
+		end
+		assert(hair and hair:FindFirstChild("Handle"), "Pal Hair no se cargó. Comprueba permisos/conexión; no se generará cabello sustituto.")
+		local handle = hair.Handle
+		assert(handle:IsA("MeshPart") or handle:FindFirstChildOfClass("SpecialMesh"), "El cabello oficial debe contener una malla 3D.")
+		backpack(avatar, meshes.Backpack)
+		texturesLoaded({avatar})
+		stripScripts(avatar)
+		avatar.PrimaryPart = avatar.HumanoidRootPart
+		h.DisplayName = "Pelotocino · prototipo visual"
+		h.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		for _, node in ipairs(avatar:GetDescendants()) do
+			if node:IsA("BasePart") then node.CanCollide = false; node.CanTouch = false; node.Anchored = true end
+		end
+		avatar:SetAttribute("VisualPrototypeOnly", true)
+		avatar:SetAttribute("AppearanceApproved", false)
+		for key, id in pairs(ids) do avatar:SetAttribute("Official" .. key .. "AssetId", id) end
+		avatar:PivotTo(CFrame.new(-2, 3, 0))
+		local npc = avatar:Clone()
+		npc.Name = "Pelotocino_NPC_Visual"
+		npc:PivotTo(CFrame.new(2, 3, 0))
+		npc.Parent = stage
+		Workshop.assertSameAppearance(avatar, npc)
+		-- Reusable Accessory handles. They are displayed separately until animation approval.
+		local equipment = Instance.new("Folder"); equipment.Name = "Equipo_SoloVisual"; equipment.Parent = stage
+		for index, name in ipairs({"Pan", "Tracker"}) do
+			local accessory = Instance.new("Accessory"); accessory.Name = name; accessory.Parent = equipment
+			local part = inert(meshes[name]:Clone()); part.Name = "Handle"; part.Anchored = true; part.Parent = accessory
+			part.Size = name == "Pan" and Vector3.new(1, 1.36, 0.235) or Vector3.new(0.44, 0.87, 0.236)
+			local attachment = Instance.new("Attachment")
+			attachment.Name = name == "Pan" and "RightGripAttachment" or "LeftGripAttachment"
+			attachment.CFrame = CFrame.new(name == "Pan" and Vector3.new(0, 0.56, 0.0325) or Vector3.new(0, -0.115, 0.103))
+			attachment.Parent = part
+			part.CFrame = CFrame.new(index * 2 - 3, 1.2, -3)
+			accessory:SetAttribute("VisualOnly", true)
+		end
+		stage:SetAttribute("ReadyForVisualReview", true)
+	end)
+	if not ok then stage:Destroy(); error("No se completó el prototipo. El Rig y el FBX originales siguen intactos. " .. tostring(err), 0) end
+	workspace:SetAttribute("PelotocinoVisualActive", stage.Name)
+	game:GetService("Selection"):Set({stage.Pelotocino_Visual})
+	print("PELOTOCINO VISUAL LISTO PARA REVISAR: " .. stage.Name .. ". Pulsa Play para ver frente, lateral y espalda. No está integrado al juego ni animado.")
+	return stage
+end
+
+return Workshop
+</ProtectedString>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="ServerScriptService" referent="RBX_NATIVE_9">
+    <Properties>
+      <string name="Name">ServerScriptService</string>
+    </Properties>
+    <Item class="Script" referent="RBX_NATIVE_10">
+      <Properties>
+        <string name="Name">VisualReviewOnly</string>
+        <ProtectedString name="Source">-- Isolated visual laboratory: no character controller, abilities or rounds.
+game:GetService("Players").CharacterAutoLoads = false
+</ProtectedString>
+      </Properties>
+    </Item>
+  </Item>
+  <Item class="StarterPlayer" referent="RBX_NATIVE_11">
+    <Properties>
+      <string name="Name">StarterPlayer</string>
+    </Properties>
+    <Item class="StarterPlayerScripts" referent="RBX_NATIVE_12">
+      <Properties>
+        <string name="Name">StarterPlayerScripts</string>
+      </Properties>
+      <Item class="LocalScript" referent="RBX_NATIVE_13">
+        <Properties>
+          <string name="Name">VisualViews</string>
+          <ProtectedString name="Source">-- These views are produced by Roblox from the installed avatar, never renders.
+local player = game:GetService("Players").LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "PelotocinoVisualReview"
+gui.IgnoreGuiInset = false
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+local background = Instance.new("Frame")
+background.Size = UDim2.fromScale(1, 1)
+background.BackgroundColor3 = Color3.fromRGB(17, 22, 29)
+background.Parent = gui
+
+local function label(parent, text, pos, size)
+	local item = Instance.new("TextLabel")
+	item.Text = text
+	item.Position = pos
+	item.Size = size
+	item.BackgroundTransparency = 1
+	item.TextColor3 = Color3.fromRGB(230, 234, 242)
+	item.Font = Enum.Font.Gotham
+	item.TextSize = 17
+	item.TextWrapped = true
+	item.Parent = parent
+	return item
+end
+
+label(background, "PELOTOCINO  /  REVISIÓN VISUAL R15", UDim2.fromScale(0.02, 0.01), UDim2.fromScale(0.96, 0.07))
+local active = workspace:GetAttribute("PelotocinoVisualActive")
+local stage = active and workspace:WaitForChild(active, 15)
+if not stage or not stage:GetAttribute("ReadyForVisualReview") then
+	label(background, "Falta montar el avatar nativo.\nDetén Play e instala el R15 y el FBX siguiendo LEEME.\nEste taller no contiene un cuerpo sustituto.", UDim2.fromScale(0.12, 0.22), UDim2.fromScale(0.76, 0.5))
+	return
+end
+local original = stage:WaitForChild("Pelotocino_Visual", 15)
+if not original then return end
+label(background, "Avatar montado en Roblox · sin animaciones · apariencia pendiente de aprobación", UDim2.fromScale(0.02, 0.08), UDim2.fromScale(0.96, 0.05))
+local views = {{"FRENTE", Vector3.new(0, 0, -1)}, {"LATERAL", Vector3.new(1, 0, 0)}, {"ESPALDA", Vector3.new(0, 0, 1)}}
+for i, spec in ipairs(views) do
+	local viewport = Instance.new("ViewportFrame")
+	viewport.Name = spec[1]
+	viewport.Position = UDim2.fromScale(0.02 + (i - 1) * 0.325, 0.16)
+	viewport.Size = UDim2.fromScale(0.31, 0.72)
+	viewport.BackgroundColor3 = Color3.fromRGB(33, 39, 48)
+	viewport.Ambient = Color3.fromRGB(200, 206, 216)
+	viewport.LightColor = Color3.fromRGB(255, 238, 218)
+	viewport.LightDirection = Vector3.new(-1, -1, -1)
+	viewport.Parent = background
+	local world = Instance.new("WorldModel"); world.Parent = viewport
+	local avatar = original:Clone(); avatar.Parent = world; avatar:PivotTo(CFrame.new())
+	local camera = Instance.new("Camera"); camera.FieldOfView = 32; camera.Parent = viewport
+	viewport.CurrentCamera = camera
+	local cf, size = avatar:GetBoundingBox()
+	local function fit()
+		local aspect = viewport.AbsoluteSize.X / math.max(1, viewport.AbsoluteSize.Y)
+		local half = math.max(size.Y / 2, math.max(size.X, size.Z) / (2 * aspect))
+		local distance = half / math.tan(math.rad(camera.FieldOfView / 2)) + math.max(size.X, size.Z) / 2
+		camera.CFrame = CFrame.lookAt(cf.Position + spec[2] * distance * 1.08, cf.Position)
+	end
+	viewport:GetPropertyChangedSignal("AbsoluteSize"):Connect(fit)
+	fit()
+	label(background, spec[1], UDim2.fromScale(0.02 + (i - 1) * 0.325, 0.89), UDim2.fromScale(0.31, 0.04))
+end
+label(background, "Captura estas tres vistas con Win + Mayús + S. Para revisar materiales PBR y el ajuste de la mochila, usa también el visor 3D de Studio.", UDim2.fromScale(0.02, 0.94), UDim2.fromScale(0.96, 0.05))
+</ProtectedString>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+</roblox>

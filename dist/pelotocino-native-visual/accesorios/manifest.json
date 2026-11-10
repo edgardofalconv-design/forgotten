@@ -1,0 +1,74 @@
+{
+  "studio_executed": false,
+  "native_avatar_included": false,
+  "source_sha256": "c83992d38eb11c9df60953ea1ea2890d48519cc4f0649ad98d420fd7c46b651b",
+  "geometry_reused_unchanged": true,
+  "groups": [
+    "Backpack",
+    "Pan",
+    "Tracker"
+  ],
+  "triangles": 5020,
+  "atlas_size": 1024,
+  "cell": 12,
+  "columns": 85,
+  "meshes": [
+    {
+      "name": "Backpack",
+      "size": [
+        1.34,
+        1.4318,
+        1.66053
+      ],
+      "center_in_anchor": [
+        0.0,
+        0.09589999914169312,
+        0.32126501202583313
+      ],
+      "vertices": 1256,
+      "triangles": 2360
+    },
+    {
+      "name": "Pan",
+      "size": [
+        1.0,
+        1.3599999999999999,
+        0.235
+      ],
+      "center_in_anchor": [
+        0.0,
+        -0.5600000023841858,
+        -0.032499998807907104
+      ],
+      "vertices": 628,
+      "triangles": 1164
+    },
+    {
+      "name": "Tracker",
+      "size": [
+        0.44,
+        0.8700000000000001,
+        0.236
+      ],
+      "center_in_anchor": [
+        0.0,
+        0.11500000208616257,
+        -0.10300000011920929
+      ],
+      "vertices": 760,
+      "triangles": 1496
+    }
+  ],
+  "geometry_max_error_fbx_round_trip": 2.384185791015625e-07,
+  "renderer": "Blender 4.3.2",
+  "preview_subject": "Accessories only; no native avatar available here",
+  "files": {
+    "Accesorios-Pelotocino.blend": "d411437a5ad538ba30d37d7c8d900a8a7fd3d26c30d31ed3ece19dc8ec3976d4",
+    "accesorios-solo-blender.png": "b3e9b167bdd56a07a9e5960489c79661ba01d12fea1aa9d6cfd33d352423d5e0",
+    "accesorios-source.json": "9ffbd899f9a5fbc2e776ad163a8308c8b55e926d8ea25d459e8de600a807e97f",
+    "Color.png": "9db2c4fa3771d89c0cb2a7e8a689920f439bf0381e9256ef28dcacbf206bbd52",
+    "Accesorios-Pelotocino.fbx": "2eb6c7882cdd22824dd9181175d521e89a592e00d22fadf27c08850a115ba2b6",
+    "Roughness.png": "8148bec7bdaa5548cf3e7c6f86f78d5d1d1549645af6939a842ebc84f5c15c1b",
+    "Metalness.png": "e84c99fed48cb926a8862d3779eed472e44a26db9e6bf2340a8415a859439c7a"
+  }
+}

@@ -1,0 +1,6 @@
+Con Play detenido, selecciona el Rig R15 nativo y el Model FBX de accesorios (Ctrl+clic).
+Abre Command Bar (Ctrl+9), pega y ejecuta:
+
+require(game:GetService("ReplicatedStorage").PelotocinoVisualWorkshop.Workshop).install()
+
+Consulta LEEME.md antes de empezar. El montaje oficial requiere Roblox Studio.

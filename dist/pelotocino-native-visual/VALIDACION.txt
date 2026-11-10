@@ -1,0 +1,2 @@
+PASS: local API doubles, Lua syntax, native-body guard, rollback, identical visual copies, XML, accessory-only FBX/UV/textures.
+NOT RUN: Roblox Studio, official catalog loading, Avatar Setup, live appearance/screenshots.
